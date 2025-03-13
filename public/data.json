@@ -1,0 +1,52 @@
+[
+    {
+        "id": 1,
+        "image": "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=150&h=150&fit=crop",
+        "descriptions": {
+            "AI": "dsfsdf",
+            "Child": "A simple and innocent description as seen through a child's eyes, using basic vocabulary and focusing on colors, shapes, and immediate visual elements.",
+            "Teenager": "A casual and relatable description from a teenage perspective, using informal language and relating the image to familiar experiences and pop culture references.", 
+            "Adult Expert": "A sophisticated analysis from an expert's viewpoint, incorporating technical terminology, historical context, and professional insights about the image's composition and significance."
+        }
+    },
+    {
+        "id": 2,
+        "image": "https://images.unsplash.com/photo-1508615263227-c5d58c1e5821?w=150&h=150&fit=crop",
+        "descriptions": {
+            "AI": "This is an AI generated description that analyzes the image in great technical detail, focusing on patterns, composition, and technical elements that would be noticed by artificial intelligence.",
+            "Child": "A simple and innocent description as seen through a child's eyes, using basic vocabulary and focusing on colors, shapes, and immediate visual elements.",
+            "Teenager": "A casual and relatable description from a teenage perspective, using informal language and relating the image to familiar experiences and pop culture references.", 
+            "Adult Expert": "A sophisticated analysis from an expert's viewpoint, incorporating technical terminology, historical context, and professional insights about the image's composition and significance."
+        }
+    },
+    {
+        "id": 3,
+        "image": "https://images.unsplash.com/photo-1599768793949-2da217e9f093?w=150&h=150&fit=crop",
+        "descriptions": {
+            "AI": "This is an AI generated description that analyzes the image in great technical detail, focusing on patterns, composition, and technical elements that would be noticed by artificial intelligence.",
+            "Child": "A simple and innocent description as seen through a child's eyes, using basic vocabulary and focusing on colors, shapes, and immediate visual elements.",
+            "Teenager": "A casual and relatable description from a teenage perspective, using informal language and relating the image to familiar experiences and pop culture references.", 
+            "Adult Expert": "A sophisticated analysis from an expert's viewpoint, incorporating technical terminology, historical context, and professional insights about the image's composition and significance."
+        }
+    },
+    {
+        "id": 4,
+        "image": "https://images.unsplash.com/photo-1599768793949-2da217e9f093?w=150&h=150&fit=crop",
+        "descriptions": {
+            "AI": "This is an AI generated description that analyzes the image in great technical detail, focusing on patterns, composition, and technical elements that would be noticed by artificial intelligence.",
+            "Child": "A simple and innocent description as seen through a child's eyes, using basic vocabulary and focusing on colors, shapes, and immediate visual elements.",
+            "Teenager": "A casual and relatable description from a teenage perspective, using informal language and relating the image to familiar experiences and pop culture references.", 
+            "Adult Expert": "A sophisticated analysis from an expert's viewpoint, incorporating technical terminology, historical context, and professional insights about the image's composition and significance."
+        }
+    },
+    {
+        "id": 5,
+        "image": "https://images.unsplash.com/photo-1605496036006-fa36378ca4ab?w=150&h=150&fit=crop",
+        "descriptions": {
+            "AI": "This is an AI generated description that analyzes the image in great technical detail, focusing on patterns, composition, and technical elements that would be noticed by artificial intelligence.",
+            "Child": "A simple and innocent description as seen through a child's eyes, using basic vocabulary and focusing on colors, shapes, and immediate visual elements.",
+            "Teenager": "A casual and relatable description from a teenage perspective, using informal language and relating the image to familiar experiences and pop culture references.", 
+            "Adult Expert": "A sophisticated analysis from an expert's viewpoint, incorporating technical terminology, historical context, and professional insights about the image's composition and significance."
+        }
+    }
+]
