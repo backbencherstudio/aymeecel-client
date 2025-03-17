@@ -3,6 +3,9 @@
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5"
+import { useRouter } from 'next/navigation'
+import { loginUser } from '@/apis/authApis'
+import { useUser } from '@/context/UserContext';
 
 interface LoginFormInputs {
     email: string;
@@ -10,16 +13,35 @@ interface LoginFormInputs {
 }
 
 export default function Login() {
-    const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>()
+    const { setUser } = useUser();
+    const { register, handleSubmit, formState: { errors }, setError } = useForm<LoginFormInputs>()
     const [showPassword, setShowPassword] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+    const router = useRouter()
 
-    const onSubmit = (data: LoginFormInputs) => {
-        // Handle login logic here
-        console.log(data)
+    const onSubmit = async (data: LoginFormInputs) => {
+        try {
+            setIsLoading(true);
+            const response = await loginUser(data.email, data.password);
+            
+            // Only store the token
+            localStorage.setItem('token', response.token);
+            // Set user data from response directly to context
+            setUser(response.user);
+            
+            router.push('/dashboard');
+        } catch (error) {
+            setError('root', {
+                type: 'manual',
+                message: typeof error === 'string' ? error : 'Login failed. Please try again.'
+            });
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     return (
-        <div className=" flex items-center justify-center bg-[linear-gradient(118deg,#9ABFBD_-1.71%,#EEF0EB_55.76%,#B69E93_100%)] min-h-screen ">
+        <div className="flex items-center justify-center bg-[linear-gradient(118deg,#9ABFBD_-1.71%,#EEF0EB_55.76%,#B69E93_100%)] min-h-screen">
             <div className="max-w-md py-10 w-full space-y-8 p-8 bg-white rounded-lg shadow">
                 <div>
                     <h2 className="text-center text-2xl font-bold text-gray-900">
@@ -27,7 +49,12 @@ export default function Login() {
                     </h2>
                 </div>
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                    <div className=" space-y-6">
+                    {errors.root && (
+                        <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">
+                            {errors.root.message}
+                        </div>
+                    )}
+                    <div className="space-y-6">
                         <div>
                             <label htmlFor="email" className="sr-only">
                                 Email address
@@ -78,9 +105,10 @@ export default function Login() {
                     <div>
                         <button
                             type="submit"
-                            className="group cursor-pointer relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#213c3a] hover:bg-[#101f1e] transition-all duration-300  "
+                            disabled={isLoading}
+                            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#213c3a] hover:bg-[#101f1e] transition-all duration-300 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                         >
-                            Login
+                            {isLoading ? 'Logging in...' : 'Login'}
                         </button>
                     </div>
                 </form>

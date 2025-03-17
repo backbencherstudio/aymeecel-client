@@ -5,6 +5,7 @@ import Image from "next/image";
 import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/footer/footer";
 
+
 interface ImageData {
     id: number;
     image: string;
@@ -45,6 +46,8 @@ export default function Page() {
     if (loading) {
         return <div>Loading...</div>;
     }
+
+
 
     const categories: (keyof ImageData['descriptions'])[] = ["AI", "Child", "Teenager", "Adult Expert"];
 
