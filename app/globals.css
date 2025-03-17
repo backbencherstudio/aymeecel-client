@@ -21,3 +21,19 @@ body {
 .image-scroll-container::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
+
+
+.skiptranslate {
+  display: none !important;
+}
+
+
+.goog-te-banner-frame {
+  display: none !important;
+}
+
+
+body {
+  top: 0px !important;
+  position: static !important;
+} 

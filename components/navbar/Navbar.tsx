@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import logo from '../../public/logo/logo.png'
 import Image from 'next/image'
 import { IoIosArrowDown } from 'react-icons/io';
+import LanguageSwitcher from '../LanguageSwitcher';
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -27,7 +28,7 @@ export default function Navbar() {
         </div>
 
         <div className="relative">
-            <button
+            {/* <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex cursor-pointer items-center gap-1 text-md font-medium"
             >
@@ -35,9 +36,9 @@ export default function Navbar() {
 
                 <IoIosArrowDown className={`text-lg transition-transform ${isOpen ? 'rotate-180' : ''}`} />
 
-            </button>
+            </button> */}
 
-            {isOpen && (
+            {/* {isOpen && (
                 <div className="absolute right-0 mt-2 w-36 bg-white/90 backdrop-blur-sm rounded-md shadow-lg py-1">
                     <button
                         onClick={() => handleLanguageSelect('EN')}
@@ -52,7 +53,8 @@ export default function Navbar() {
                         DE | Deutsch
                     </button>
                 </div>
-            )}
+            )} */}
+            <LanguageSwitcher />
         </div>
     </div>
     )

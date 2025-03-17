@@ -99,8 +99,8 @@ export default function Page() {
                                                         height={500}
                                                         src={item.image}
                                                         alt={`Image ${item.id}`}
-                                                        className={`w-[75px] h-[62px] sm:w-[65px] sm:h-[55px] md:w-[110px] md:h-[80px] rounded-xl transition-all duration-200 ${selectedImage === index
-                                                            ? 'w-[97px] h-[80px] sm:w-[97px] sm:h-[80px] md:w-[210px] md:h-[120px] object-cover brightness-100'
+                                                        className={`w-[75px]  h-[62px] sm:w-[65px] sm:h-[55px] md:w-[110px] md:h-[80px]  rounded-xl transition-all duration-200 ${selectedImage === index
+                                                            ? 'w-[97px] h-[80px] sm:w-[97px] sm:h-[80px] md:w-[210px] md:h-[120px]  brightness-100'
                                                             : 'brightness-50 hover:brightness-75'
                                                             }`}
                                                     />
@@ -150,17 +150,33 @@ export default function Page() {
                             <div className="w-full py-5 md:py-5 md:w-[75%] bg-[#FFFFFF33] shadow-lg rounded-b-[2rem] md:rounded-s-none md:rounded-r-[2rem] p-2 md:p-4">
                                 {data[selectedImage] && (
                                     <div className="flex flex-col h-full">
-                                        <div className="rounded-2xl mb-4">
+                                        <div className="rounded-2xl mb-4 w-full relative">
                                             {imageLoading ? (
                                                 <div className="animate-pulse bg-gray-200 rounded-2xl w-full h-[220px] sm:h-[290px] md:h-[290px] lg:h-[360px]" />
                                             ) : (
-                                                <Image
-                                                    width={700}
-                                                    height={700}
-                                                    src={data[selectedImage].image}
-                                                    alt={`Image ${data[selectedImage].id}`}
-                                                    className="rounded-2xl w-full h-[220px] sm:h-[290px] sm:w-full md:h-[290px] md:w-full lg:h-[360px] lg:w-full mx-auto "
-                                                />
+                                                <>
+                                                    {/* Blurred background image */}
+                                                    <div className="absolute inset-0 overflow-hidden rounded-2xl">
+                                                        <Image
+                                                            width={1200}
+                                                            height={800}
+                                                            src={data[selectedImage].image}
+                                                            alt=""
+                                                            className="w-full h-full  object-cover scale-110 blur-md opacity-50"
+                                                            style={{ width: '100%', height: '100%' }}
+                                                        />
+                                                    </div>
+                                                    {/* Main image */}
+                                                    <div className="relative rounded-2xl flex justify-center items-center bg-transparent h-[220px] w-full sm:h-[290px] md:h-[290px] lg:h-[360px]">
+                                                        <Image
+                                                            width={500}
+                                                            height={800}
+                                                            src={data[selectedImage].image}
+                                                            alt={`Image ${data[selectedImage].id}`}
+                                                            className="rounded-2xl h-full w-auto max-w-full object-contain"
+                                                        />
+                                                    </div>
+                                                </>
                                             )}
                                         </div>
 

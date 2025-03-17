@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Script from "next/script";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -14,14 +15,34 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
-      <body
+      <body 
         className={`${inter.variable} antialiased`}
+        suppressHydrationWarning={true}
       >
+        <div id="google_translate_element" style={{ display: "hidden" }}></div>
+
+        <Script id="google-translate-init" strategy="afterInteractive">
+          {`
+            function googleTranslateElementInit() {
+              new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,de',
+                autoDisplay: false
+              }, 'google_translate_element');
+            }
+          `}
+        </Script>
+
+        <Script
+          src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+          strategy="afterInteractive"
+        />
+
         {children}
       </body>
     </html>
