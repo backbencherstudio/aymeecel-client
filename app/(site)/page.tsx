@@ -4,10 +4,18 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/footer/footer";
+import { getAllPost } from "@/apis/postDataApis";
 
+interface Post {
+    id: string;
+    image: string;
+    descriptions: string;
+    createdAt: string;
+    updatedAt: string;
+}
 
 interface ImageData {
-    id: number;
+    id: string;
     image: string;
     descriptions: {
         AI: string;
@@ -25,17 +33,23 @@ export default function Page() {
     const [imageLoading, setImageLoading] = useState(false);
 
     useEffect(() => {
-        fetch('data.json')
-            .then(response => response.json())
-            .then(jsonData => {
-                setData(jsonData);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('Error loading data:', error);
-                setLoading(false);
-            });
+        fetchPosts();
     }, []);
+    const fetchPosts = async () => {
+        try {
+            const response = await getAllPost();
+            const formattedData = response.posts.map((post: Post) => ({
+                id: post.id,
+                image: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/uploads/${post.image}`,
+                descriptions: JSON.parse(post.descriptions)
+            }));
+            setData(formattedData);
+            setLoading(false);
+        } catch (error) {
+            console.error('Error loading data:', error);
+            setLoading(false);
+        }
+    };
 
     const handleDotClick = (index: number) => {
         setImageLoading(true);
@@ -46,9 +60,6 @@ export default function Page() {
     if (loading) {
         return <div>Loading...</div>;
     }
-
-
-
     const categories: (keyof ImageData['descriptions'])[] = ["AI", "Child", "Teenager", "Adult Expert"];
 
     return (
