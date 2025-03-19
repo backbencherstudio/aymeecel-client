@@ -5,9 +5,10 @@ import { RiLockPasswordLine } from 'react-icons/ri'
 import { useUser } from '@/context/UserContext'
 import Image from 'next/image'
 import { IoCamera } from 'react-icons/io5'
-import { updateUser } from '@/apis/authApis'
+import { updateUser, changePassword } from '@/apis/authApis'
 import { toast } from 'react-hot-toast'
 import { FiEdit2 } from 'react-icons/fi' // Add this import at the top
+import { IoEyeOutline, IoEyeOffOutline } from 'react-icons/io5' // Add this import
 
 export default function Settings() {
     const [activeTab, setActiveTab] = useState('profile')
@@ -18,6 +19,15 @@ export default function Settings() {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [isEditingName, setIsEditingName] = useState(false)
+
+    // Add password-related state here
+    const [oldPassword, setOldPassword] = useState('')
+    const [newPassword, setNewPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [isChangingPassword, setIsChangingPassword] = useState(false)
+    const [showOldPassword, setShowOldPassword] = useState(false)
+    const [showNewPassword, setShowNewPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
     const handleImageClick = () => {
         fileInputRef.current?.click()
@@ -46,14 +56,16 @@ export default function Settings() {
             const response = await updateUser(user?.id, formData)
             
             if (response.success) {
-                // Update local storage with new user data
                 localStorage.setItem('user', JSON.stringify(response.user))
-                // Refresh user context
                 await refreshUser()
                 toast.success('Profile updated successfully')
             }
-        } catch (error) {
-            toast.error(typeof error === 'string' ? error : 'Failed to update profile')
+        } catch (error: any) {
+            if (error.response?.status === 401) {
+                toast.error('Session expired. Please login again.')
+            } else {
+                toast.error(error.response?.data?.message || 'Failed to update profile')
+            }
         } finally {
             setIsLoading(false)
         }
@@ -65,6 +77,41 @@ export default function Settings() {
         const imageChanged = selectedFile !== null
         return nameChanged || imageChanged
     }, [name, selectedFile, user?.name])
+
+    // Add handleChangePassword function before the return statement
+    const handleChangePassword = async () => {
+        if (newPassword !== confirmPassword) {
+            toast.error('New passwords do not match')
+            return
+        }
+
+        if (newPassword.length < 6) {
+            toast.error('Password must be at least 6 characters long')
+            return
+        }
+
+        try {
+            setIsChangingPassword(true)
+            const response = await changePassword(oldPassword, newPassword)
+            
+            if (response.success) {
+                toast.success('Password changed successfully')
+                setOldPassword('')
+                setNewPassword('')
+                setConfirmPassword('')
+            }
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                toast.error(error.response.data.message)
+            } else if (error.response?.status === 401) {
+                toast.error('Session expired. Please login again.')
+            } else {
+                toast.error('Old password is incorrect')
+            }
+        } finally {
+            setIsChangingPassword(false)
+        }
+    }
 
     // Update button component
     const UpdateButton = () => (
@@ -208,39 +255,88 @@ export default function Settings() {
                         ) : (
                             <div className="space-y-6">
                                 <h2 className="text-xl font-semibold text-gray-800">Change Password</h2>
-                                <div className="space-y-4">
+                                <div className="space-y-4 max-w-2xl">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             Current Password
                                         </label>
-                                        <input
-                                            type="password"
-                                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-indigo-600"
-                                            placeholder="Enter current password"
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                type={showOldPassword ? 'text' : 'password'}
+                                                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-indigo-600"
+                                                placeholder="Enter current password"
+                                                value={oldPassword}
+                                                onChange={(e) => setOldPassword(e.target.value)}
+                                            />
+                                            <button
+                                                type="button"
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                                onClick={() => setShowOldPassword(!showOldPassword)}
+                                            >
+                                                {showOldPassword ? (
+                                                    <IoEyeOffOutline className="w-5 h-5" />
+                                                ) : (
+                                                    <IoEyeOutline className="w-5 h-5" />
+                                                )}
+                                            </button>
+                                        </div>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             New Password
                                         </label>
-                                        <input
-                                            type="password"
-                                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-indigo-600"
-                                            placeholder="Enter new password"
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                type={showNewPassword ? 'text' : 'password'}
+                                                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-indigo-600"
+                                                placeholder="Enter new password"
+                                                value={newPassword}
+                                                onChange={(e) => setNewPassword(e.target.value)}
+                                            />
+                                            <button
+                                                type="button"
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                                onClick={() => setShowNewPassword(!showNewPassword)}
+                                            >
+                                                {showNewPassword ? (
+                                                    <IoEyeOffOutline className="w-5 h-5" />
+                                                ) : (
+                                                    <IoEyeOutline className="w-5 h-5" />
+                                                )}
+                                            </button>
+                                        </div>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             Confirm New Password
                                         </label>
-                                        <input
-                                            type="password"
-                                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-indigo-600"
-                                            placeholder="Confirm new password"
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                type={showConfirmPassword ? 'text' : 'password'}
+                                                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-indigo-600"
+                                                placeholder="Confirm new password"
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                            />
+                                            <button
+                                                type="button"
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            >
+                                                {showConfirmPassword ? (
+                                                    <IoEyeOffOutline className="w-5 h-5" />
+                                                ) : (
+                                                    <IoEyeOutline className="w-5 h-5" />
+                                                )}
+                                            </button>
+                                        </div>
                                     </div>
-                                    <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300">
-                                        Change Password
+                                    <button 
+                                        className="w-full sm:w-auto px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                        onClick={handleChangePassword}
+                                        disabled={isChangingPassword || !oldPassword || !newPassword || !confirmPassword}
+                                    >
+                                        {isChangingPassword ? 'Changing Password...' : 'Change Password'}
                                     </button>
                                 </div>
                             </div>
