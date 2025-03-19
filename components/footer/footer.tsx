@@ -1,6 +1,7 @@
 import React from 'react';
 import logo from '@/public/logo/log.png'
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Footer() {
     return (
@@ -14,7 +15,7 @@ export default function Footer() {
                     </div>
 
                     <div className="flex items-center space-x-6">
-                        <img src="/api/placeholder/40/40" alt="Lorem Ipsum logo" className="h-8 w-8" />
+                        <Image width={100} height={100} src="/api/placeholder/40/40" alt="Lorem Ipsum logo" className="h-8 w-8" />
                         <div className="bg-gray-300 px-4 py-1 text-sm text-gray-600">LOGO</div>
                         <div className="flex items-center">
                             <div className="h-6 w-6 rounded-full border border-gray-300 mr-1"></div>
@@ -31,19 +32,19 @@ export default function Footer() {
                     <div className="flex items-center">
                         <ul className="flex space-x-6">
                             <li>
-                                <a href="/" className="text-sm text-gray-600 hover:text-gray-800">
+                                <Link href="/" className="text-sm text-gray-600 hover:text-gray-800">
                                     Privacy Policy
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="/" className="text-sm text-gray-600 hover:text-gray-800">
+                                <Link href="/" className="text-sm text-gray-600 hover:text-gray-800">
                                     Terms of Service
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a href="/" className="text-sm text-gray-600 hover:text-gray-800">
+                                <Link href="/" className="text-sm text-gray-600 hover:text-gray-800">
                                     Cookies Settings
-                                </a>
+                                </Link>
                             </li>
                         </ul>
                     </div>

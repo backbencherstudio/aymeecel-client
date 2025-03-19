@@ -5,7 +5,8 @@ import { useForm } from 'react-hook-form'
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5"
 import { useRouter } from 'next/navigation'
 import { loginUser } from '@/apis/authApis'
-import { useUser } from '@/context/UserContext';
+import { useUser } from '@/context/UserContext'
+import toast from 'react-hot-toast' 
 
 interface LoginFormInputs {
     email: string;
@@ -14,7 +15,7 @@ interface LoginFormInputs {
 
 export default function Login() {
     const { setUser } = useUser();
-    const { register, handleSubmit, formState: { errors }, setError } = useForm<LoginFormInputs>()
+    const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>()
     const [showPassword, setShowPassword] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
@@ -23,18 +24,15 @@ export default function Login() {
         try {
             setIsLoading(true);
             const response = await loginUser(data.email, data.password);
-            
-            // Only store the token
             localStorage.setItem('token', response.token);
-            // Set user data from response directly to context
             setUser(response.user);
-            
+            toast.success(response.message || 'Successfully logged in!');
             router.push('/dashboard');
-        } catch (error) {
-            setError('root', {
-                type: 'manual',
-                message: typeof error === 'string' ? error : 'Login failed. Please try again.'
-            });
+        } catch (error: unknown) {
+            const errorMessage = error && typeof error === 'object' && 'response' in error
+                ? (error.response as { data?: { message?: string } })?.data?.message
+                : 'Login failed. Please try again.';
+            toast.error(errorMessage || 'An error occurred');
         } finally {
             setIsLoading(false);
         }
@@ -49,11 +47,7 @@ export default function Login() {
                     </h2>
                 </div>
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                    {errors.root && (
-                        <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">
-                            {errors.root.message}
-                        </div>
-                    )}
+
                     <div className="space-y-6">
                         <div>
                             <label htmlFor="email" className="sr-only">
@@ -69,7 +63,7 @@ export default function Login() {
                                     }
                                 })}
                                 type="email"
-                                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-600 focus:border-indigo-600"
                                 placeholder="Email address"
                             />
                             {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
@@ -83,12 +77,12 @@ export default function Login() {
                                 {...register("password", {
                                     required: "Password is required",
                                     minLength: {
-                                        value: 6,
+                                        value: 5,
                                         message: "Password must be at least 6 characters"
                                     }
                                 })}
                                 type={showPassword ? "text" : "password"}
-                                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-600 focus:border-indigo-600"
                                 placeholder="Password"
                             />
                             <button
@@ -106,7 +100,7 @@ export default function Login() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#213c3a] hover:bg-[#101f1e] transition-all duration-300 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 cursor-pointer transition-all duration-300 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                         >
                             {isLoading ? 'Logging in...' : 'Login'}
                         </button>

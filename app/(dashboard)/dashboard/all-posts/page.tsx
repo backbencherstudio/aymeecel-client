@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { getAllPost } from '@/apis/postDataApis';
+import Image from 'next/image';
 
 interface Post {
   id: string;
@@ -10,15 +11,7 @@ interface Post {
   updatedAt: string;
 }
 
-interface PostResponse {
-  success: boolean;
-  message: string;
-  currentPage: number;
-  totalPages: number;
-  totalPosts: number;
-  nextPage: boolean;
-  posts: Post[];
-}
+
 
 export default function AllPost() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -56,9 +49,11 @@ export default function AllPost() {
           const descriptions = JSON.parse(post.descriptions);
           return (
             <div key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-              <img 
-                src={`http://192.168.40.10:4000/uploads/${post.image}`} 
-                alt="Post" 
+              <Image
+                width={400}
+                height={400}
+                src={`http://192.168.40.10:4000/uploads/${post.image}`}
+                alt="Post"
                 className="w-full h-48 object-cover"
               />
               <div className="p-4">

@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { IoCloseCircle } from "react-icons/io5";
 
 import { createPost } from "@/apis/postDataApis";
+import Image from 'next/image';
 
 interface PostFormData {
   image: File | null;
@@ -40,19 +41,19 @@ export default function CreatePost() {
         return;
       }
       setIsSubmitting(true);
-      
+
       // Call the create post API
       await createPost(data.descriptions, data.image);
-      
+
       // Reset all form fields
       reset();
       setSelectedImage(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
-      
+
       console.log('Post created successfully');
-      
+
     } catch (error) {
       console.error('Error creating post:', error);
     } finally {
@@ -110,7 +111,7 @@ export default function CreatePost() {
             <div className="space-y-1 text-center">
               {selectedImage ? (
                 <div className="relative inline-block">
-                  <img src={selectedImage} alt="Preview" className="mx-auto h-64 w-auto" />
+                  <Image width={200} height={200} src={selectedImage} alt="Preview" className="mx-auto h-64 w-auto" />
                   <button
                     type="button"
                     onClick={(e) => {
@@ -128,7 +129,12 @@ export default function CreatePost() {
                     <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                   <p className="text-sm">Click or drag to upload an image</p>
-                  <p>recommended image </p>
+                  <p className="text-sm text-gray-400 flex items-center justify-center gap-2 mt-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Optimal dimensions: 722 × 360 pixels
+                  </p>
                 </div>
               )}
               <input

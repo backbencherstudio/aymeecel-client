@@ -1,23 +1,28 @@
+/* eslint-disable @typescript-eslint/no-namespace */
+/* eslint-disable no-var */
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
 
-// Define structure for languages
 interface LanguageDescriptor {
   name: string;
   title: string;
 }
 
-// Types for JS-based config (from external file)
+// Types for translation configuration
+interface TranslationConfig {
+  languages: LanguageDescriptor[];
+  defaultLanguage: string;
+}
+
+// Declare global property
 declare global {
-  namespace globalThis {
-    var __GOOGLE_TRANSLATION_CONFIG__: {
-      languages: LanguageDescriptor[];
-      defaultLanguage: string;
-    };
+  interface Window {
+    __GOOGLE_TRANSLATION_CONFIG__: TranslationConfig;
   }
 }
-type DropdownType = string
+
+type DropdownType = string;
 
 const LanguageSwitcher = () => {
   const [languageDropDown, setLanguageDropDown] = useState(false)
@@ -81,7 +86,7 @@ const LanguageSwitcher = () => {
         {/* Language Dropdown */}
         <div ref={languageDropdownRef} className='relative w-[120px] inline-block text-left  '>
           <button
-            className='flex justify-between cursor-pointer items-center w-full  px-4 py-2 gap-x-1.5 rounded-md bg-white text-sm font-semibold text-gray-900 mt-2'
+            className='flex justify-between cursor-pointer items-center w-full  px-4 py-2 gap-x-1.5 rounded-md bg-white shadow-sm border border-gray-300 text-sm font-semibold text-gray-900 mt-2'
             onClick={handleDropdownToggle('language')}
           >
             {/* <img src={languageLogo} alt='Language' className='w-6 h-6' /> */}

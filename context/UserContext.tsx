@@ -2,29 +2,33 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface User {
-  email: string;
-  name: string;
+  id: string;
+  name?: string;
+  email?: string;
   image?: string;
   role?: string;
 }
 
-interface UserContextType {
+export const UserContext = createContext<{
   user: User | null;
-  setUser: (user: User | null) => void;
-}
-
-const UserContext = createContext<UserContextType | undefined>(undefined);
+  setUser: (user: User | null) => void;  
+  refreshUser: () => Promise<void>;
+}>({
+  user: null,
+  setUser: () => {},  
+  refreshUser: async () => {},
+});
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
-  useEffect(() => {
-    // Load user data from localStorage on initial mount
+  const refreshUser = async () => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const updatedUser = JSON.parse(storedUser);
+      setUser(updatedUser);
     }
-  }, []);
+  };
 
   const handleSetUser = (newUser: User | null) => {
     setUser(newUser);
@@ -38,6 +42,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const value = {
     user,
     setUser: handleSetUser,
+    refreshUser,  
   };
 
   return (

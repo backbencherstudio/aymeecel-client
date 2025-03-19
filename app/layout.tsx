@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import Providers from "@/providers/Providers";
+import { Toaster } from 'react-hot-toast';
 
 
 const inter = Inter({
@@ -49,7 +50,7 @@ export default function RootLayout({
         <Providers>
           {children}
         </Providers>
-
+        <Toaster position="top-center" />
       </body>
     </html>
   );

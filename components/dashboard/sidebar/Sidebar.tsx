@@ -8,7 +8,6 @@ import {
     HiCog,
     HiPencilAlt,
     HiCollection,
-    HiLogout
 } from 'react-icons/hi';
 import { useUser } from '@/context/UserContext';
 import { HiArrowRightOnRectangle } from "react-icons/hi2";
@@ -18,7 +17,7 @@ interface SidebarProps {
     onClose: () => void;
 }
 
-export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+export default function Sidebar({  onClose }: SidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
     const { setUser } = useUser();

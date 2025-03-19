@@ -38,7 +38,7 @@ export default function Page() {
     const fetchPosts = async () => {
         try {
             const response = await getAllPost();
-            const formattedData = response.posts.map((post: Post) => ({
+            const formattedData = response?.posts?.map((post: Post) => ({
                 id: post.id,
                 image: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/uploads/${post.image}`,
                 descriptions: JSON.parse(post.descriptions)
@@ -98,7 +98,7 @@ export default function Page() {
 
                                     <div className="mx-2 h-[120px] flex justify-center items-center md:my-5 flex-1 md:w-full">
                                         <div className="flex items-center md:block space-x-2 md:space-x-0 md:space-y-3 lg:max-h-[570px] overflow-x-auto md:overflow-y-auto image-scroll-container py-1">
-                                            {data.map((item, index) => (
+                                            {data?.map((item, index) => (
                                                 <div
                                                     key={item.id}
                                                     className="flex-shrink-0 md:flex-shrink md:flex md:justify-center md:items-center"
@@ -111,8 +111,8 @@ export default function Page() {
                                                     <Image
                                                         width={500}
                                                         height={500}
-                                                        src={item.image}
-                                                        alt={`Image ${item.id}`}
+                                                        src={item?.image}
+                                                        alt='not found'
                                                         className={`w-[75px]  h-[62px] sm:w-[65px] sm:h-[55px] md:w-[110px] md:h-[80px]  rounded-xl transition-all duration-200 ${selectedImage === index
                                                             ? 'w-[97px] h-[80px] sm:w-[97px] sm:h-[80px] md:w-[210px] md:h-[120px]  brightness-100'
                                                             : 'brightness-50 hover:brightness-75'
@@ -149,7 +149,7 @@ export default function Page() {
                                 </div>
                                 {/* Mobile Dots Navigation */}
                                 <div className="flex mt-5 md:hidden justify-center items-center gap-2">
-                                    {data.map((_, index) => (
+                                    {data?.map((_, index) => (
                                         <button
                                             key={index}
                                             onClick={() => handleDotClick(index)}
@@ -172,11 +172,11 @@ export default function Page() {
                                                     {/* Blurred background image */}
                                                     <div className="absolute inset-0 overflow-hidden rounded-2xl">
                                                         <Image
-                                                            width={1200}
-                                                            height={800}
-                                                            src={data[selectedImage].image}
-                                                            alt=""
-                                                            className="w-full h-full  object-cover scale-110 blur-md opacity-50"
+                                                            width={500}
+                                                            height={500}
+                                                            src={data[selectedImage]?.image}
+                                                            alt="not found"
+                                                            className="w-full h-full object-cover scale-110 blur-md opacity-50"
                                                             style={{ width: '100%', height: '100%' }}
                                                         />
                                                     </div>
@@ -184,10 +184,10 @@ export default function Page() {
                                                     <div className="relative rounded-2xl flex justify-center items-center bg-transparent h-[220px] w-full sm:h-[290px] md:h-[290px] lg:h-[360px]">
                                                         <Image
                                                             width={500}
-                                                            height={800}
-                                                            src={data[selectedImage].image}
-                                                            alt={`Image ${data[selectedImage].id}`}
-                                                            className="rounded-2xl h-full w-auto max-w-full object-contain"
+                                                            height={500}
+                                                            src={data[selectedImage]?.image}
+                                                            alt="not found"
+                                                            className="rounded-2xl h-full w-auto max-w-full "
                                                         />
                                                     </div>
                                                 </>
@@ -201,7 +201,7 @@ export default function Page() {
                                                     <div key={i} className="animate-pulse bg-gray-100 border border-gray-200 h-10 rounded-[12.216px]" />
                                                 ))
                                             ) : (
-                                                categories.map(category => (
+                                                categories?.map(category => (
                                                     <button
                                                         key={category}
                                                         onClick={() => setSelectedCategory(category)}
@@ -225,7 +225,7 @@ export default function Page() {
                                                 </div>
                                             ) : (
                                                 <p className="text-gray-700 text-[0.95rem] leading-relaxed">
-                                                    {data[selectedImage].descriptions[selectedCategory]}
+                                                    {data[selectedImage]?.descriptions[selectedCategory]}
                                                 </p>
                                             )}
                                         </div>
