@@ -1,5 +1,15 @@
 import axiosClient from "@/lip/axiosClient";
 
+interface ApiError {
+  response?: {
+    status?: number;
+    data?: {
+      message?: string;
+    };
+  };
+  message?: string;
+}
+
 // Function to handle login API request
 export const loginUser = async (email: string, password: string) => {
     try {
@@ -8,15 +18,16 @@ export const loginUser = async (email: string, password: string) => {
             password,
         });
         
-        return response.data;
-    } catch (error) {
-        if (error instanceof Error) {
-            throw error.message;
-        } else if (typeof error === 'object' && error !== null && 'response' in error) {
-            throw (error as any).response?.data || 'An unknown error occurred';
-        } else {
-            throw 'An unknown error occurred';
-        }
+        return {
+            success: true,
+            message: response.data.message || 'Successfully logged in!',
+            token: response.data.token,
+            user: response.data.user
+        };
+    } catch (error: any) {
+        throw error.response?.data || {
+            message: 'An unknown error occurred'
+        };
     }
 };
 
@@ -29,15 +40,15 @@ export const updateUser = async (id: string, data: FormData) => {
                 'Content-Type': 'multipart/form-data',
             },
         });
-        return response.data;
-    } catch (error) {
-        if (error instanceof Error) {
-            throw error.message;
-        } else if (typeof error === 'object' && error !== null && 'response' in error) {
-            throw (error as any).response?.data || 'An unknown error occurred';
-        } else {
-            throw 'An unknown error occurred';
-        }
+        return {
+            success: true,
+            message: response.data.message || 'Profile updated successfully',
+            user: response.data.user
+        };
+    } catch (error: any) {
+        throw error.response?.data || {
+            message: 'An unknown error occurred'
+        };
     }
 };
 
@@ -50,14 +61,13 @@ export const changePassword = async (oldPassword: string, newPassword: string) =
             oldPassword,
             newPassword,
         });
-        return response.data;
-    } catch (error) {
-        if (error instanceof Error) {
-            throw error.message;
-        } else if (typeof error === 'object' && error !== null && 'response' in error) {
-            throw (error as any).response?.data || 'An unknown error occurred';
-        } else {
-            throw 'An unknown error occurred';
-        }
+        return {
+            success: true,
+            message: response.data.message || 'Password changed successfully'
+        };
+    } catch (error: any) {
+        throw error.response?.data || {
+            message: 'An unknown error occurred'
+        };
     }
 };

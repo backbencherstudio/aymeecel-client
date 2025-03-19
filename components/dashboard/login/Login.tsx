@@ -13,6 +13,17 @@ interface LoginFormInputs {
     password: string;
 }
 
+// Add ApiError interface import or definition
+interface ApiError {
+    response?: {
+        status?: number;
+        data?: {
+            message?: string;
+        };
+    };
+    message?: string;
+}
+
 export default function Login() {
     const { setUser } = useUser();
     const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>()
@@ -24,15 +35,20 @@ export default function Login() {
         try {
             setIsLoading(true);
             const response = await loginUser(data.email, data.password);
-            localStorage.setItem('token', response.token);
-            setUser(response.user);
-            toast.success(response.message || 'Successfully logged in!');
-            router.push('/dashboard');
+            
+            if (response.success) {
+                localStorage.setItem('token', response.token);
+                setUser(response.user);
+                toast.success(response.message);
+                router.push('/dashboard/create-post');
+            }
         } catch (error: unknown) {
-            const errorMessage = error && typeof error === 'object' && 'response' in error
-                ? (error.response as { data?: { message?: string } })?.data?.message
-                : 'Login failed. Please try again.';
-            toast.error(errorMessage || 'An error occurred');
+            const err = error as ApiError;
+            if (err.response?.status === 401) {
+                toast.error('Invalid email or password');
+            } else {
+                toast.error(err.message || 'Login failed. Please try again.');
+            }
         } finally {
             setIsLoading(false);
         }

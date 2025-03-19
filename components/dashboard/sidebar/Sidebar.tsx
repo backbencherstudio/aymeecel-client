@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { IoClose } from 'react-icons/io5';
 import {
-    HiHome,
+    // HiHome,
     HiCog,
     HiPencilAlt,
     HiCollection,
@@ -17,7 +17,7 @@ interface SidebarProps {
     onClose: () => void;
 }
 
-export default function Sidebar({  onClose }: SidebarProps) {
+export default function Sidebar({ onClose }: SidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
     const { setUser } = useUser();
@@ -30,7 +30,7 @@ export default function Sidebar({  onClose }: SidebarProps) {
     };
 
     const menuItems = [
-        { icon: HiHome, label: 'Dashboard', href: '/dashboard' },
+        // { icon: HiHome, label: 'Dashboard', href: '/dashboard' },
         { icon: HiPencilAlt, label: 'Create Post', href: '/dashboard/create-post' },
         { icon: HiCollection, label: 'All Posts', href: '/dashboard/all-posts' },
         { icon: HiCog, label: 'Settings', href: '/dashboard/settings' },

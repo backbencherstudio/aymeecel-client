@@ -19,32 +19,94 @@ export const createPost = async (descriptions: PostDescriptions, image: File) =>
             },
         });
 
-        return response.data;
-    } catch (error) {
-        if (error instanceof Error) {
-            throw error.message;
-        } else if (typeof error === 'object' && error !== null && 'response' in error) {
-            throw (error as any).response?.data || 'An unknown error occurred';
-        } else {
-            throw 'An unknown error occurred';
-        }
+        return {
+            success: true,
+            message: response.data.message || 'Post created successfully',
+            post: response.data.post
+        };
+    } catch (error: any) {
+        throw error.response?.data || {
+            message: 'An unknown error occurred'
+        };
     }
-}
+};
 
 
 // get all post 
 
-export const getAllPost = async () => {
-    try {
-        const response = await axiosClient.get('/posts/get-all-post');
-        return response.data;
-    } catch (error) {
-        if (error instanceof Error) {
-            throw error.message;
-        } else if (typeof error === 'object' && error !== null && 'response' in error) {
-            throw (error as any).response?.data || 'An unknown error occurred';
-        } else {
-            throw 'An unknown error occurred';
-        }
-    }
+interface PaginatedResponse {
+    success: boolean;
+    message: string;
+    currentPage: number;
+    totalPages: number;
+    totalPosts: number;
+    nextPage: boolean;
+    posts: any[];
 }
+
+export const getAllPost = async (page: number = 1, limit: number = 5) => {
+    try {
+        const response = await axiosClient.get(`/posts/get-all-post?page=${page}&limit=${limit}`);
+        return response.data as PaginatedResponse;
+    } catch (error: any) {
+        throw error.response?.data || {
+            message: 'An unknown error occurred'
+        };
+    }
+};
+
+
+// delete data 
+export const deletePost = async (postId: string) => {
+    try {
+        const response = await axiosClient.delete(`/posts/${postId}`);
+        return response.data;
+    } catch (error: any) {
+        throw error.response?.data || {
+            message: 'An unknown error occurred'
+        };
+    }
+};
+
+// update post
+export const updatePost = async (postId: string, descriptions: PostDescriptions, image?: File) => {
+    try {
+        const formData = new FormData();
+        if (image) {
+            formData.append('image', image);
+        }
+        formData.append('descriptions', JSON.stringify(descriptions));
+
+        const response = await axiosClient.put(`/posts/${postId}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        return {
+            success: true,
+            message: response.data.message || 'Post updated successfully',
+            post: response.data.post
+        };
+    } catch (error: any) {
+        throw error.response?.data || {
+            message: 'An unknown error occurred'
+        };
+    }
+};
+
+
+// Add this function to get a single post
+export const getPostById = async (postId: string) => {
+    try {
+        const response = await axiosClient.get(`/posts/${postId}`);
+        return {
+            success: true,
+            post: response.data.post
+        };
+    } catch (error: any) {
+        throw error.response?.data || {
+            message: 'An unknown error occurred'
+        };
+    }
+};

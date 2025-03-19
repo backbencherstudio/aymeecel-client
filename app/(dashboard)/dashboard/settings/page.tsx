@@ -10,6 +10,16 @@ import { toast } from 'react-hot-toast'
 import { FiEdit2 } from 'react-icons/fi' // Add this import at the top
 import { IoEyeOutline, IoEyeOffOutline } from 'react-icons/io5' // Add this import
 
+interface ApiError {
+  response?: {
+    status?: number;
+    data?: {
+      message?: string;
+    };
+  };
+  message?: string;
+}
+
 export default function Settings() {
     const [activeTab, setActiveTab] = useState('profile')
     const { user, refreshUser } = useUser()
@@ -43,33 +53,33 @@ export default function Settings() {
     }
 
     const handleUpdateProfile = async () => {
-        if (!user?.id) return
+        if (!user?.id) return;
 
         try {
-            setIsLoading(true)
-            const formData = new FormData()
-            formData.append('name', name)
+            setIsLoading(true);
+            const formData = new FormData();
+            formData.append('name', name);
             if (selectedFile) {
-                formData.append('image', selectedFile)
+                formData.append('image', selectedFile);
             }
-
-            const response = await updateUser(user?.id, formData)
-            
+            const response = await updateUser(user?.id, formData);
             if (response.success) {
-                localStorage.setItem('user', JSON.stringify(response.user))
-                await refreshUser()
-                toast.success('Profile updated successfully')
+                localStorage.setItem('user', JSON.stringify(response.user));
+                await refreshUser();
+                toast.success(response.message);
+                setSelectedFile(null);
             }
-        } catch (error: any) {
-            if (error.response?.status === 401) {
-                toast.error('Session expired. Please login again.')
+        } catch (error: unknown) {
+            const err = error as ApiError;
+            if (err.response?.status === 401) {
+                toast.error('Session expired. Please login again.');
             } else {
-                toast.error(error.response?.data?.message || 'Failed to update profile')
+                toast.error(err.message || 'Failed to update profile');
             }
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
-    }
+    };
 
     // Add new state to track if there are changes
     const hasChanges = React.useMemo(() => {
@@ -81,37 +91,33 @@ export default function Settings() {
     // Add handleChangePassword function before the return statement
     const handleChangePassword = async () => {
         if (newPassword !== confirmPassword) {
-            toast.error('New passwords do not match')
-            return
+            toast.error('New passwords do not match');
+            return;
         }
 
         if (newPassword.length < 6) {
-            toast.error('Password must be at least 6 characters long')
-            return
+            toast.error('Password must be at least 6 characters long');
+            return;
         }
 
         try {
-            setIsChangingPassword(true)
-            const response = await changePassword(oldPassword, newPassword)
+            setIsChangingPassword(true);
+            const response = await changePassword(oldPassword, newPassword);
             
             if (response.success) {
-                toast.success('Password changed successfully')
-                setOldPassword('')
-                setNewPassword('')
-                setConfirmPassword('')
+                toast.success(response.message);
+                // Reset form
+                setOldPassword('');
+                setNewPassword('');
+                setConfirmPassword('');
             }
-        } catch (error: any) {
-            if (error.response?.data?.message) {
-                toast.error(error.response.data.message)
-            } else if (error.response?.status === 401) {
-                toast.error('Session expired. Please login again.')
-            } else {
-                toast.error('Old password is incorrect')
-            }
+        } catch (error: unknown) {
+            const err = error as ApiError;
+            toast.error(err.message || 'Failed to change password');
         } finally {
-            setIsChangingPassword(false)
+            setIsChangingPassword(false);
         }
-    }
+    };
 
     // Update button component
     const UpdateButton = () => (

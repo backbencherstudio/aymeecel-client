@@ -3,6 +3,7 @@ import ProtectedLayout from '@/auth/ProtectedLayout';
 import Navbar from '@/components/dashboard/navbar/Navbar';
 import Sidebar from '@/components/dashboard/sidebar/Sidebar';
 import React, { useState } from 'react';
+import { Toaster } from 'react-hot-toast';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -42,6 +43,7 @@ const Layout = ({ children }: LayoutProps) => {
           {/* Content Area */}
           <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4">
             {children}
+            <Toaster position="top-center" />
           </main>
         </div>
       </div>

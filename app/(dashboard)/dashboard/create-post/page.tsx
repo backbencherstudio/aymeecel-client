@@ -1,10 +1,12 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { IoCloseCircle } from "react-icons/io5";
-
-import { createPost } from "@/apis/postDataApis";
+import { useRouter, useSearchParams } from 'next/navigation'
+import { createPost, updatePost, getPostById } from "@/apis/postDataApis";
 import Image from 'next/image';
+
+import toast from 'react-hot-toast'
+import { IoCloseCircle } from 'react-icons/io5';
 
 interface PostFormData {
   image: File | null;
@@ -16,48 +18,23 @@ interface PostFormData {
   }
 }
 
-// Add loading state at the top of the component with other state declarations
 export default function CreatePost() {
-  // Add reset to the destructured useForm hook
-  const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm<PostFormData>();
+  const { register, handleSubmit, setValue, reset, formState: { errors }, clearErrors } = useForm<PostFormData>();
+  // Remove existingImage state since it's not used
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const searchParams = useSearchParams();
+  const postId = searchParams.get('id');
+  const [isEditMode, setIsEditMode] = useState(false);
+  const router = useRouter();
+
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setSelectedImage(URL.createObjectURL(file));
       setValue('image', file); // Set the file value in the form
-    }
-  };
-
-
-
-  // Update the onSubmit function
-  const onSubmit = async (data: PostFormData) => {
-    try {
-      if (!data.image) {
-        return;
-      }
-      setIsSubmitting(true);
-
-      // Call the create post API
-      await createPost(data.descriptions, data.image);
-
-      // Reset all form fields
-      reset();
-      setSelectedImage(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-
-      console.log('Post created successfully');
-
-    } catch (error) {
-      console.error('Error creating post:', error);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -92,9 +69,104 @@ export default function CreatePost() {
     e.stopPropagation();
   };
 
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (postId) {
+        try {
+          setIsEditMode(true);
+          const response = await getPostById(postId);
+          if (response.success) {
+            const post = response.post;
+            const descriptions = JSON.parse(post.descriptions);
+            
+            // Set form values
+            reset({
+              descriptions: {
+                AI: descriptions.AI,
+                Child: descriptions.Child,
+                Teenager: descriptions.Teenager,
+                "Adult Expert": descriptions["Adult Expert"]
+              }
+            });
+
+            // Set image preview if exists
+            if (post.image) {
+              const imageUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}/uploads/${post.image}`;
+              setSelectedImage(imageUrl);
+              clearErrors('image');
+            }
+          }
+        } catch (error) {
+          // Proper type handling for error
+          if (error && typeof error === 'object' && 'message' in error) {
+            toast.error(error.message as string || 'Failed to fetch post');
+          } else {
+            toast.error('Failed to fetch post');
+          }
+        }
+      }
+    };
+
+    fetchPost();
+  }, [postId, reset, clearErrors]);
+
+  // Add this interface with other interfaces at the top
+  interface ApiError {
+    response?: {
+      status?: number;
+      data?: {
+        message?: string;
+      };
+    };
+    message?: string;
+  }
+
+  const onSubmit = async (data: PostFormData) => {
+    try {
+      setIsSubmitting(true);
+
+      if (isEditMode && postId) {
+        // Update existing post
+        const response = await updatePost(
+          postId, 
+          data.descriptions, 
+          data.image || undefined
+        );
+        if (response.success) {
+          toast.success('Post updated successfully');
+          router.push('/dashboard/all-posts');
+        }
+      } else {
+        // Create new post
+        if (!data.image) {
+          toast.error('Please select an image');
+          return;
+        }
+        const response = await createPost(data.descriptions, data.image);
+        if (response.success) {
+          toast.success(response.message);
+          reset();
+          setSelectedImage(null);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+        }
+      }
+    } catch (error: unknown) {
+      const err = error as ApiError;
+      if (err.response?.status === 401) {
+        toast.error('Session expired. Please login again.');
+      } else {
+        toast.error(err.message || `Failed to ${isEditMode ? 'update' : 'create'} post`);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Create New Post</h1>
+      <h1 className="text-2xl font-bold mb-6">{isEditMode ? 'Update Post' : 'Create New Post'}</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Image Upload */}
@@ -140,7 +212,9 @@ export default function CreatePost() {
               <input
                 type="file"
                 accept="image/*"
-                {...register('image', { required: 'Image is required' })}
+                {...register('image', { 
+                  required: !isEditMode ? 'Image is required' : false 
+                })}
                 ref={fileInputRef}
                 onChange={handleImageChange}
                 className="hidden"
@@ -222,10 +296,10 @@ export default function CreatePost() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Creating...
+                {isEditMode ? 'Updating...' : 'Creating...'}
               </>
             ) : (
-              'Create Post'
+              isEditMode ? 'Update Post' : 'Create Post'
             )}
           </button>
         </div>
