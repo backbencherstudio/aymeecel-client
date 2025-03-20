@@ -1,3 +1,4 @@
+
 'use client'
 import ProtectedLayout from '@/auth/ProtectedLayout';
 import Navbar from '@/components/dashboard/navbar/Navbar';
