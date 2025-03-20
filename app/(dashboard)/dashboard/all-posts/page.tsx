@@ -47,6 +47,8 @@ export default function AllPost() {
   const [totalPosts, setTotalPosts] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedText, setSelectedText] = useState({ text: '', field: '' });
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<string | null>(null);
 
   const truncateText = (text: string, id: string, field: string) => {
     const maxLength = 20;
@@ -70,10 +72,11 @@ export default function AllPost() {
   };
 
   // Add this new component for the modal
+  // In DescriptionModal component
   const DescriptionModal = () => {
     return (
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className=" max-h-[80vh] overflow-y-auto">
+        <DialogContent className="modal-content-enter max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{selectedText.field} Description</DialogTitle>
           </DialogHeader>
@@ -168,6 +171,43 @@ export default function AllPost() {
     router.push(`/dashboard/create-post?id=${postId}`);
   };
 
+  // Add this new component for delete confirmation
+  // In DeleteConfirmationModal component
+  const DeleteConfirmationModal = () => {
+    return (
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className="modal-content-enter">
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+            <div className="flex justify-end gap-3 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setIsDeleteModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  if (postToDelete) {
+                    handleDelete(postToDelete);
+                    setIsDeleteModalOpen(false);
+                  }
+                }}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  };
+
+  // Modify the handleDelete function
   const handleDelete = async (postId: string) => {
     try {
       const response = await deletePost(postId);
@@ -184,12 +224,15 @@ export default function AllPost() {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to delete post';
       toast.error(errorMessage);
+    } finally {
+      setPostToDelete(null);
     }
   };
 
   return (
     <div className="max-w-8xl mx-auto">
       <DescriptionModal />
+      <DeleteConfirmationModal />
       <h1 className="text-2xl font-bold mb-6">All Posts</h1>
       
       {/* Add error handling */}
@@ -280,7 +323,10 @@ export default function AllPost() {
                           </DropdownMenuItem>
 
                           <DropdownMenuItem
-                            onClick={() => handleDelete(post.id)}
+                            onClick={() => {
+                              setPostToDelete(post.id);
+                              setIsDeleteModalOpen(true);
+                            }}
                             className="cursor-pointer text-red-600"
                           >
                             <Trash className="mr-2 h-4 w-4" />
