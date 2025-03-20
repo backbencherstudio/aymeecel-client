@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-namespace */
-/* eslint-disable no-var */
 'use client';
 
 import { useEffect, useState, useRef } from 'react';

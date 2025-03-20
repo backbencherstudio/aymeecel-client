@@ -15,7 +15,7 @@ export default function Footer() {
                     </div>
 
                     <div className="flex items-center space-x-6">
-                        <Image width={100} height={100} src="/api/placeholder/40/40" alt="Lorem Ipsum logo" className="h-8 w-8" />
+                        <div className="bg-gray-300 px-4 py-1 text-sm text-gray-600">LOGO</div>
                         <div className="bg-gray-300 px-4 py-1 text-sm text-gray-600">LOGO</div>
                         <div className="flex items-center">
                             <div className="h-6 w-6 rounded-full border border-gray-300 mr-1"></div>
