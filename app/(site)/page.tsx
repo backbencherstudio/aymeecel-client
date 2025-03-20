@@ -58,7 +58,11 @@ export default function Page() {
     };
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div className="flex items-center justify-center h-64">
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            </div>
+        </div>;
     }
     const categories: (keyof ImageData['descriptions'])[] = ["AI", "Child", "Teenager", "Adult Expert"];
 
