@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from '@/public/logo/log.png'
-import Image from 'next/image';
 import Link from 'next/link';
+import CustomImage from '../Reusable/CustomImage/CustomImage';
 
 export default function Footer() {
     return (
@@ -10,7 +10,7 @@ export default function Footer() {
                 {/* Logo section */}
                 <div className="flex flex-col md:flex-row gap-10 md:gap-0 justify-between items-start md:items-center mb-8">
                     <div className="flex items-center">
-                        <Image src={logo} width={200} height={100} alt="University of Zurich logo" className="w-[228px] h-[77px]" />
+                        <CustomImage src={logo.src} width={200} height={100} alt="University of Zurich logo" className="w-[228px] h-[77px]" />
 
                     </div>
 

@@ -1,10 +1,10 @@
 "use client";
 import { IoChevronUpOutline, IoChevronDownOutline, IoChevronBackOutline, IoChevronForwardOutline } from "react-icons/io5";
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/footer/footer";
 import { getAllPost } from "@/apis/postDataApis";
+import CustomImage from "@/components/Reusable/CustomImage/CustomImage";
 
 interface Post {
     id: string;
@@ -112,7 +112,7 @@ export default function Page() {
                                                         setTimeout(() => setImageLoading(false), 200);
                                                     }}
                                                 >
-                                                    <Image
+                                                    <CustomImage
                                                         width={500}
                                                         height={500}
                                                         src={item?.image}
@@ -175,7 +175,7 @@ export default function Page() {
                                                 <>
                                                     {/* Blurred background image */}
                                                     <div className="absolute inset-0 overflow-hidden rounded-2xl">
-                                                        <Image
+                                                        <CustomImage
                                                             width={500}
                                                             height={500}
                                                             src={data[selectedImage]?.image}
@@ -186,7 +186,7 @@ export default function Page() {
                                                     </div>
                                                     {/* Main image */}
                                                     <div className="relative rounded-2xl flex justify-center items-center bg-transparent h-[220px] w-full sm:h-[290px] md:h-[290px] lg:h-[360px]">
-                                                        <Image
+                                                        <CustomImage
                                                             width={500}
                                                             height={500}
                                                             src={data[selectedImage]?.image}

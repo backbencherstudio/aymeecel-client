@@ -3,21 +3,21 @@ import React, { useState, useRef } from 'react'
 import { IoPersonOutline } from 'react-icons/io5'
 import { RiLockPasswordLine } from 'react-icons/ri'
 import { useUser } from '@/context/UserContext'
-import Image from 'next/image'
 import { IoCamera } from 'react-icons/io5'
 import { updateUser, changePassword } from '@/apis/authApis'
 import { toast } from 'react-hot-toast'
 import { FiEdit2 } from 'react-icons/fi' // Add this import at the top
 import { IoEyeOutline, IoEyeOffOutline } from 'react-icons/io5' // Add this import
+import CustomImage from '@/components/Reusable/CustomImage/CustomImage'
 
 interface ApiError {
-  response?: {
-    status?: number;
-    data?: {
-      message?: string;
+    response?: {
+        status?: number;
+        data?: {
+            message?: string;
+        };
     };
-  };
-  message?: string;
+    message?: string;
 }
 
 export default function Settings() {
@@ -103,7 +103,7 @@ export default function Settings() {
         try {
             setIsChangingPassword(true);
             const response = await changePassword(oldPassword, newPassword);
-            
+
             if (response.success) {
                 toast.success(response.message);
                 // Reset form
@@ -121,7 +121,7 @@ export default function Settings() {
 
     // Update button component
     const UpdateButton = () => (
-        <button 
+        <button
             className="w-full sm:w-auto px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
             onClick={handleUpdateProfile}
             disabled={isLoading || !hasChanges}
@@ -143,11 +143,10 @@ export default function Settings() {
                                 <li className="flex-shrink-0">
                                     <button
                                         onClick={() => setActiveTab('profile')}
-                                        className={`flex cursor-pointer items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 whitespace-nowrap ${
-                                            activeTab === 'profile'
-                                                ? 'bg-blue-50 text-indigo-600'
-                                                : 'text-gray-700 hover:bg-gray-100'
-                                        }`}
+                                        className={`flex cursor-pointer items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 whitespace-nowrap ${activeTab === 'profile'
+                                            ? 'bg-blue-50 text-indigo-600'
+                                            : 'text-gray-700 hover:bg-gray-100'
+                                            }`}
                                     >
                                         <IoPersonOutline className="h-5 w-5 mr-3 flex-shrink-0" />
                                         Update Profile
@@ -156,11 +155,10 @@ export default function Settings() {
                                 <li className="flex-shrink-0">
                                     <button
                                         onClick={() => setActiveTab('password')}
-                                        className={`flex cursor-pointer items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 whitespace-nowrap ${
-                                            activeTab === 'password'
-                                                ? 'bg-blue-50 text-indigo-600'
-                                                : 'text-gray-700 hover:bg-gray-100'
-                                        }`}
+                                        className={`flex cursor-pointer items-center w-full px-4 py-2 rounded-lg transition-colors duration-200 whitespace-nowrap ${activeTab === 'password'
+                                            ? 'bg-blue-50 text-indigo-600'
+                                            : 'text-gray-700 hover:bg-gray-100'
+                                            }`}
                                     >
                                         <RiLockPasswordLine className="h-5 w-5 mr-3 flex-shrink-0" />
                                         Change Password
@@ -175,18 +173,21 @@ export default function Settings() {
                         {activeTab === 'profile' ? (
                             <div className="space-y-6">
                                 <h2 className="text-xl font-semibold text-gray-800">Profile Information</h2>
-                                
+
                                 {/* Profile Image Section */}
                                 <div className="flex flex-col items-center sm:items-start space-y-4">
                                     <div className="relative group">
                                         <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200">
                                             {previewImage ? (
-                                                <Image
+
+
+                                                <CustomImage
                                                     src={previewImage}
-                                                    alt="Profile"
+                                                    alt='profile'
+                                                    className="w-full h-full object-cover"
                                                     width={128}
                                                     height={128}
-                                                    className="w-full h-full object-cover"
+
                                                 />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center">
@@ -233,7 +234,7 @@ export default function Settings() {
                                                     <div className="w-full px-4 py-2 rounded-lg border border-transparent bg-gray-50">
                                                         {name || 'Enter your full name'}
                                                     </div>
-                                                    <button 
+                                                    <button
                                                         onClick={() => setIsEditingName(true)}
                                                         className="absolute right-2 p-2 text-gray-500 hover:text-indigo-600"
                                                     >
@@ -337,7 +338,7 @@ export default function Settings() {
                                             </button>
                                         </div>
                                     </div>
-                                    <button 
+                                    <button
                                         className="w-full sm:w-auto px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
                                         onClick={handleChangePassword}
                                         disabled={isChangingPassword || !oldPassword || !newPassword || !confirmPassword}

@@ -3,10 +3,10 @@ import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createPost, updatePost, getPostById } from "@/apis/postDataApis";
-import Image from 'next/image';
 
 import toast from 'react-hot-toast'
 import { IoCloseCircle } from 'react-icons/io5';
+import CustomImage from '@/components/Reusable/CustomImage/CustomImage';
 
 interface PostFormData {
   image: File | null;
@@ -183,7 +183,7 @@ export default function CreatePost() {
             <div className="space-y-1 text-center">
               {selectedImage ? (
                 <div className="relative inline-block">
-                  <Image width={200} height={200} src={selectedImage} alt="Preview" className="mx-auto h-64 w-auto" />
+                  <CustomImage width={200} height={200} src={selectedImage} alt="Preview" className="mx-auto h-64 w-auto" />
                   <button
                     type="button"
                     onClick={(e) => {

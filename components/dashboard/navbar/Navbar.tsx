@@ -2,8 +2,8 @@
 import React from 'react';
 import { HiMenuAlt2 } from 'react-icons/hi';
 import { useUser } from '@/context/UserContext';
-import Image from 'next/image';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import CustomImage from '@/components/Reusable/CustomImage/CustomImage';
 
 interface NavbarProps {
   onMenuClick: () => void;
@@ -33,14 +33,14 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
             <div className="flex items-center space-x-2 md:space-x-3">
               {user?.image && (
                 <div className="relative w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden flex-shrink-0">
-                  <Image
+                  <CustomImage
                     src={user?.image}
                     alt="Profile"
                     width={48}
                     height={48}
                     className="rounded-full object-cover"
                     style={{ width: '100%', height: '100%' }}
-                    priority
+             
                   />
                 </div>
               )}

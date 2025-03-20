@@ -1,7 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { deletePost, getAllPost } from '@/apis/postDataApis';
-import Image from 'next/image';
 import { toast } from 'react-hot-toast';
 import {
   Dialog,
@@ -31,6 +30,7 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useCallback } from 'react';
 import { searchPosts } from '@/apis/postDataApis';
 import debounce from 'lodash/debounce';
+import CustomImage from '../../../../components/Reusable/CustomImage/CustomImage';
 
 
 interface Post {
@@ -346,7 +346,7 @@ export default function AllPost() {
                     </TableCell>
                     <TableCell className="p-2">
                       <div className="flex items-center justify-center">
-                        <Image
+                        <CustomImage
                           width={100}
                           height={100}
                           src={`${process.env.NEXT_PUBLIC_API_ENDPOINT}/uploads/${post.image}`}
