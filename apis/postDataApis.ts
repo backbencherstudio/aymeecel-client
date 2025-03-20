@@ -56,6 +56,19 @@ export const getAllPost = async (page: number = 1, limit: number = 5) => {
 };
 
 
+// search post
+// Modify the searchPosts function to include pagination
+export const searchPosts = async (query: string, page: number = 1, limit: number = 5) => {
+    try {
+        const response = await axiosClient.get(`/posts/search?query=${query}&page=${page}&limit=${limit}`);
+        return response.data as PaginatedResponse;
+    } catch (error: any) {
+        throw error.response?.data || {
+            message: 'An unknown error occurred'
+        };
+    }
+};
+
 // delete data 
 export const deletePost = async (postId: string) => {
     try {

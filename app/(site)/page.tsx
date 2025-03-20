@@ -66,7 +66,7 @@ export default function Page() {
         <>
             <div className="bg-[linear-gradient(118deg,#9ABFBD_-1.71%,#EEF0EB_55.76%,#B69E93_100%)] min-h-screen px-2 sm:px-5 xl:px-0">
                 <Navbar />
-                <div className="flex justify-center mt-10 xl:mt-0  items-center xl:min-h-[calc(100vh-150px)]">
+                <div className="flex justify-center py-10 xl:mt-0  items-center xl:min-h-[calc(100vh-150px)]">
                     <div className="bg-transparent border-2 border-[#FFFFFF33] rounded-[2rem] shadow-lg max-w-5xl w-full">
                         <div className="flex flex-col md:flex-row w-full gap-3 md:gap-5">
                             {/* Sidebar with thumbnails - Modified for responsive */}
@@ -97,7 +97,7 @@ export default function Page() {
                                     </div>
 
                                     <div className="mx-2 h-[120px] flex justify-center items-center md:my-5 flex-1 md:w-full">
-                                        <div className="flex items-center md:block   space-x-2 md:space-x-0 md:space-y-3 lg:max-h-[570px] overflow-x-auto md:overflow-y-auto image-scroll-container py-1">
+                                        <div className="flex items-center md:block space-x-2 md:space-x-0 md:space-y-3 lg:max-h-[570px] overflow-x-auto md:overflow-y-auto image-scroll-container py-1">
                                             {data?.map((item, index) => (
                                                 <div
                                                     key={item.id}
@@ -114,8 +114,8 @@ export default function Page() {
                                                         src={item?.image}
                                                         alt='not found'
                                                         className={`w-[75px]  h-[62px] sm:w-[65px] sm:h-[55px] md:w-[110px] md:h-[80px]  rounded-xl transition-all duration-200 ${selectedImage === index
-                                                            ? 'w-[97px] h-[80px] sm:w-[97px] sm:h-[80px] md:w-[210px] md:h-[120px] object-contain brightness-100'
-                                                            : 'brightness-50 hover:brightness-75'
+                                                            ? 'w-[97px] h-[80px]  lg:object-contain sm:w-[97px] sm:h-[80px] md:w-[210px] md:h-[120px] brightness-100'
+                                                            : 'brightness-50  hover:brightness-75'
                                                             }`}
                                                     />
                                                 </div>

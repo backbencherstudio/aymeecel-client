@@ -25,7 +25,12 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal, Pencil, Trash } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useRouter } from 'next/navigation';
+
+import { Search } from "lucide-react"; 
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { useCallback } from 'react';
+import { searchPosts } from '@/apis/postDataApis';
+import debounce from 'lodash/debounce';
 
 
 interface Post {
@@ -38,9 +43,12 @@ interface Post {
 
 export default function AllPost() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -52,7 +60,7 @@ export default function AllPost() {
 
   const truncateText = (text: string, id: string, field: string) => {
     const maxLength = 20;
-    // Remove unused key variable
+
     if (text.length <= maxLength) return text;
 
     return (
@@ -71,7 +79,7 @@ export default function AllPost() {
     );
   };
 
-  // Add this new component for the modal
+
   // In DescriptionModal component
   const DescriptionModal = () => {
     return (
@@ -171,7 +179,6 @@ export default function AllPost() {
     router.push(`/dashboard/create-post?id=${postId}`);
   };
 
-  // Add this new component for delete confirmation
   // In DeleteConfirmationModal component
   const DeleteConfirmationModal = () => {
     return (
@@ -229,12 +236,69 @@ export default function AllPost() {
     }
   };
 
+  const debouncedSearch = useCallback(
+    debounce(async (query: string) => {
+      try {
+        setLoading(true);
+        const params = new URLSearchParams(searchParams.toString());
+        if (query) {
+          params.set('search', query);
+        } else {
+          params.delete('search');
+        }
+        router.push(`${pathname}?${params.toString()}`);
+
+        if (query.trim()) {
+          const response = await searchPosts(query);
+          if (response.success) {
+            setPosts(response.posts);
+            setTotalPages(response.totalPages || 1);
+            setTotalPosts(response.totalPosts || response.posts.length);
+          }
+        } else {
+          const response = await getAllPost(currentPage);
+          if (response.success) {
+            setPosts(response.posts);
+            setTotalPages(response.totalPages);
+            setTotalPosts(response.totalPosts);
+          }
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to search posts';
+        toast.error(errorMessage);
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    }, 500),
+    [pathname, router, searchParams, currentPage]
+  );
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    debouncedSearch(query);
+  };
+
   return (
     <div className="max-w-8xl mx-auto">
       <DescriptionModal />
       <DeleteConfirmationModal />
-      <h1 className="text-2xl font-bold mb-6">All Posts</h1>
-      
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">All Posts</h1>
+        <div className="relative w-64">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 text-indigo-600" />
+          </div>
+          <input
+            type="text"
+            className="block w-full pl-10 pr-3 py-2 border border-indigo-600 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-600 focus:border-indigo-600 sm:text-sm"
+            placeholder="Search posts..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+          />
+        </div>
+      </div>
       {/* Add error handling */}
       {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md text-red-600">
@@ -245,7 +309,15 @@ export default function AllPost() {
       {/* Add loading state */}
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          </div>
+        </div>
+      ) : posts.length === 0 ? (
+        <div className="rounded-md border shadow h-[calc(100vh-250px)] flex flex-col items-center justify-center bg-gray-50">
+          <Search className="h-12 w-12 mb-4 text-gray-400" />
+          <p className="text-xl font-medium text-gray-600">No posts found</p>
+          <p className="text-sm text-gray-500 mt-2">Try adjusting your search or filters</p>
         </div>
       ) : (
         <div className="rounded-md border shadow">
