@@ -105,7 +105,7 @@ export default function Page() {
                                             {data?.map((item, index) => (
                                                 <div
                                                     key={item.id}
-                                                    className="flex-shrink-0 md:flex-shrink md:flex md:justify-center md:items-center"
+                                                    className="flex-shrink-0 md:flex-shrink md:flex md:justify-center md:items-center cursor-pointer"
                                                     onClick={() => {
                                                         setImageLoading(true);
                                                         setSelectedImage(index);
@@ -117,9 +117,10 @@ export default function Page() {
                                                         height={500}
                                                         src={item?.image}
                                                         alt='not found'
-                                                        className={`w-[75px]  h-[62px] sm:w-[65px] sm:h-[55px] md:w-[110px] md:h-[80px]  rounded-xl transition-all duration-200 ${selectedImage === index
-                                                            ? 'w-[97px] h-[80px]  lg:object-contain sm:w-[97px] sm:h-[80px] md:w-[210px] md:h-[120px] brightness-100'
-                                                            : 'brightness-50  hover:brightness-75'
+                                                        className={`object-cover rounded-[6.805px] md:rounded-[18.324px] transition-all duration-200 
+                                                            ${selectedImage === index
+                                                                ? 'w-[85px] h-[65px] sm:w-[95px] sm:h-[75px] md:w-[110px] md:h-[90px] lg:w-[213px] lg:h-[125px]'
+                                                                : 'w-[75px] h-[55px] sm:w-[85px] sm:h-[65px] md:w-[100px] md:h-[75px] lg:w-[120px] lg:h-[90px] brightness-30 hover:brightness-75'
                                                             }`}
                                                     />
                                                 </div>
@@ -180,12 +181,12 @@ export default function Page() {
                                                             height={500}
                                                             src={data[selectedImage]?.image}
                                                             alt="not found"
-                                                            className="w-full h-full object-cover scale-110 blur-md opacity-50"
+                                                            className="w-full h-full object-cover scale-110 blur-lg brightness-60 bg-black/80"
                                                             style={{ width: '100%', height: '100%' }}
                                                         />
                                                     </div>
                                                     {/* Main image */}
-                                                    <div className="relative rounded-2xl flex justify-center items-center bg-transparent h-[220px] w-full sm:h-[290px] md:h-[290px] lg:h-[360px]">
+                                                    <div className="relative rounded-2xl flex justify-center items-center bg-transparent h-[190px] w-full sm:h-[290px] md:h-[290px] lg:h-[360px]">
                                                         <CustomImage
                                                             width={500}
                                                             height={500}
@@ -209,12 +210,18 @@ export default function Page() {
                                                     <button
                                                         key={category}
                                                         onClick={() => setSelectedCategory(category)}
-                                                        className={`px-4 py-2 rounded-[12.216px] ${selectedCategory === category
-                                                            ? 'bg-[#213C3A]  text-white'
-                                                            : 'bg-[#FFF]'
+                                                        className={`px-4 cursor-pointer py-2 rounded-[12.216px] transition-all duration-300 
+                                                            ${selectedCategory === category
+                                                                ? 'bg-[#213C3A] text-white shadow-[0_0_15px_rgba(33,60,58,0.7)] border border-[#213C3A]'
+                                                                : 'bg-[#FFF] hover:shadow-[0_0_10px_rgba(255,255,255,0.7)] hover:border hover:border-white'
+                                                            } ${category === 'Teenager' && selectedCategory !== category 
+                                                                ? 'hover:text-[#213C3A] hover:bg-opacity-90'
+                                                                : ''
                                                             }`}
                                                     >
-                                                        {category}
+                                                        <span className={`${selectedCategory === category ? 'text-shadow-neon' : ''}`}>
+                                                            {category}
+                                                        </span>
                                                     </button>
                                                 ))
                                             )}

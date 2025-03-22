@@ -203,3 +203,10 @@ body {
 .modal-content-exit {
   animation: modalFadeOut 0.2s ease-in;
 }
+
+
+.text-shadow-neon {
+    text-shadow: 0 0 10px rgba(255,255,255,0.8),
+                 0 0 20px rgba(255,255,255,0.8),
+                 0 0 30px rgba(33,60,58,0.7);
+}

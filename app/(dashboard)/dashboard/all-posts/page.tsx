@@ -236,6 +236,7 @@ export default function AllPost() {
     }
   };
 
+  // Update the debouncedSearch implementation
   const debouncedSearch = useCallback(
     debounce(async (query: string) => {
       try {
@@ -271,7 +272,7 @@ export default function AllPost() {
         setLoading(false);
       }
     }, 500),
-    [pathname, router, searchParams, currentPage]
+    [pathname, router, searchParams, currentPage, setPosts, setTotalPages, setTotalPosts, setLoading, setError]  // Add all dependencies
   );
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
