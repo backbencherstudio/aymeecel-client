@@ -212,7 +212,7 @@ export default function Page() {
                                                         onClick={() => setSelectedCategory(category)}
                                                         className={`px-4 cursor-pointer py-2 rounded-[12.216px] transition-all duration-300 
                                                             ${selectedCategory === category
-                                                                ? 'bg-[#213C3A] text-white shadow-[0_0_15px_rgba(33,60,58,0.7)] border border-[#213C3A]'
+                                                                ? 'bg-[#213C3A] text-white  border border-[#213C3A]'
                                                                 : 'bg-[#FFF] hover:shadow-[0_0_10px_rgba(255,255,255,0.7)] hover:border hover:border-white'
                                                             } ${category === 'Teenager' && selectedCategory !== category 
                                                                 ? 'hover:text-[#213C3A] hover:bg-opacity-90'
