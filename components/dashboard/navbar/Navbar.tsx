@@ -2,8 +2,9 @@
 import React from 'react';
 import { HiMenuAlt2 } from 'react-icons/hi';
 import { useUser } from '@/context/UserContext';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
 import CustomImage from '@/components/Reusable/CustomImage/CustomImage';
+import CustomLangSwitcher from '@/components/CustomLangSwitcher';
+
 
 interface NavbarProps {
   onMenuClick: () => void;
@@ -27,7 +28,8 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
         </div>
         <div className="flex items-center space-x-2 md:space-x-4">
 
-          <LanguageSwitcher />
+          {/* <LanguageSwitcher /> */}
+          <CustomLangSwitcher />
 
           {user ? (
             <div className="flex items-center space-x-2 md:space-x-3">
@@ -40,7 +42,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
                     height={48}
                     className="rounded-full object-cover"
                     style={{ width: '100%', height: '100%' }}
-             
+
                   />
                 </div>
               )}

@@ -5,11 +5,13 @@ import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/footer/footer";
 import { getAllPost } from "@/apis/postDataApis";
 import CustomImage from "@/components/Reusable/CustomImage/CustomImage";
+import { useLanguage } from '@/context/LanguageContext';
 
 interface Post {
     id: string;
     image: string;
-    descriptions: string;
+    descriptions_en: string;
+    descriptions_de: string;
     createdAt: string;
     updatedAt: string;
 }
@@ -25,24 +27,32 @@ interface ImageData {
     };
 }
 
-export default function Page() {
+export default function Home() {
     const [data, setData] = useState<ImageData[]>([]);
     const [selectedImage, setSelectedImage] = useState(0);
     const [selectedCategory, setSelectedCategory] = useState<keyof ImageData['descriptions']>("Teenager");
     const [loading, setLoading] = useState(true);
     const [imageLoading, setImageLoading] = useState(false);
+    const { selectedLang } = useLanguage();
 
     useEffect(() => {
         fetchPosts();
-    }, []);
+    }, [selectedLang]);
+
     const fetchPosts = async () => {
         try {
-            const response = await getAllPost();
-            const formattedData = response?.posts?.map((post: Post) => ({
-                id: post.id,
-                image: `${process.env.NEXT_PUBLIC_API_ENDPOINT}/uploads/${post.image}`,
-                descriptions: JSON.parse(post.descriptions)
-            }));
+            const response = await getAllPost(1, 100, selectedLang as 'en' | 'de');
+            const formattedData = response?.posts?.map((post: Post) => {
+                // Parse the descriptions based on selected language
+                const descriptionsField = selectedLang === 'en' ? 'descriptions_en' : 'descriptions_de';
+                const descriptions = post[descriptionsField] ? JSON.parse(post[descriptionsField]) : JSON.parse(post.descriptions_en);
+                
+                return {
+                    id: post.id,
+                    image: post.image,
+                    descriptions: descriptions
+                };
+            });
             setData(formattedData);
             setLoading(false);
         } catch (error) {

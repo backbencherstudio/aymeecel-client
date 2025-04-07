@@ -25,18 +25,18 @@ import {
 import { MoreHorizontal, Pencil, Trash } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-import { Search } from "lucide-react"; 
+import { Search } from "lucide-react";
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useCallback } from 'react';
-import { searchPosts } from '@/apis/postDataApis';
 import debounce from 'lodash/debounce';
 import CustomImage from '../../../../components/Reusable/CustomImage/CustomImage';
-
+import { useLanguage } from '@/context/LanguageContext';
 
 interface Post {
   id: string;
   image: string;
-  descriptions: string;
+  descriptions_en: string;
+  descriptions_de: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -57,7 +57,7 @@ export default function AllPost() {
   const [selectedText, setSelectedText] = useState({ text: '', field: '' });
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
-
+  const { selectedLang } = useLanguage();
   const truncateText = (text: string, id: string, field: string) => {
     const maxLength = 20;
 
@@ -99,16 +99,16 @@ export default function AllPost() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await getAllPost(currentPage);
+        const response = await getAllPost(currentPage, 5, selectedLang as 'en' | 'de');
         if (response.success) {
           setPosts(response.posts);
           setTotalPages(response.totalPages);
           setTotalPosts(response.totalPosts);
         }
       } catch (error) {
-        if (error && typeof error === 'object' && 'response' in error && 
-            error.response && typeof error.response === 'object' && 
-            'status' in error.response && error.response.status === 401) {
+        if (error && typeof error === 'object' && 'response' in error &&
+          error.response && typeof error.response === 'object' &&
+          'status' in error.response && error.response.status === 401) {
           toast.error('Session expired. Please login again.');
           setError('Session expired');
         } else {
@@ -122,7 +122,7 @@ export default function AllPost() {
     };
 
     fetchPosts();
-  }, [currentPage]);
+  }, [currentPage, selectedLang]);
 
   // Add pagination controls
   const handlePageChange = (newPage: number) => {
@@ -220,8 +220,8 @@ export default function AllPost() {
       const response = await deletePost(postId);
       if (response.success) {
         toast.success('Post deleted successfully');
-        // Refresh the posts list
-        const updatedResponse = await getAllPost(currentPage);
+        // Refresh the posts list with correct parameters
+        const updatedResponse = await getAllPost(currentPage, 5, selectedLang as 'en' | 'de');
         if (updatedResponse.success) {
           setPosts(updatedResponse.posts);
           setTotalPages(updatedResponse.totalPages);
@@ -237,34 +237,56 @@ export default function AllPost() {
   };
 
   // Update the debouncedSearch implementation
+
   const debouncedSearch = useCallback(
     debounce(async (query: string) => {
       try {
         setLoading(true);
         const params = new URLSearchParams(searchParams.toString());
+
+        // Set language parameter
+        params.set('lang', selectedLang);
+
+        // Set search parameter if it exists
         if (query) {
           params.set('search', query);
         } else {
           params.delete('search');
         }
-        router.push(`${pathname}?${params.toString()}`);
 
-        if (query.trim()) {
-          const response = await searchPosts(query);
-          if (response.success) {
-            setPosts(response.posts);
-            setTotalPages(response.totalPages || 1);
-            setTotalPosts(response.totalPosts || response.posts.length);
-          }
-        } else {
-          const response = await getAllPost(currentPage);
-          if (response.success) {
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+
+        // Get all posts first
+        const response = await getAllPost(currentPage, 5, selectedLang as 'en' | 'de');
+
+        if (response.success) {
+          if (query.trim()) {
+            // Client-side filtering based on the selected language
+            const filteredPosts = response.posts.filter(post => {
+              const descriptionsField = selectedLang === 'en' ? 'descriptions_en' : 'descriptions_de';
+              const descriptions = post[descriptionsField] ? JSON.parse(post[descriptionsField]) : JSON.parse(post.descriptions_en);
+
+              // Search in all description fields
+              const searchLower = query.toLowerCase();
+              return (
+                descriptions.AI.toLowerCase().includes(searchLower) ||
+                descriptions.Child.toLowerCase().includes(searchLower) ||
+                descriptions.Teenager.toLowerCase().includes(searchLower) ||
+                descriptions["Adult Expert"].toLowerCase().includes(searchLower)
+              );
+            });
+
+            setPosts(filteredPosts);
+            setTotalPages(1); 
+            setTotalPosts(filteredPosts.length);
+          } else {
             setPosts(response.posts);
             setTotalPages(response.totalPages);
             setTotalPosts(response.totalPosts);
           }
         }
       } catch (error) {
+        console.error('Search error:', error);
         const errorMessage = error instanceof Error ? error.message : 'Failed to search posts';
         toast.error(errorMessage);
         setError(errorMessage);
@@ -272,14 +294,24 @@ export default function AllPost() {
         setLoading(false);
       }
     }, 500),
-    [pathname, router, searchParams, currentPage, setPosts, setTotalPages, setTotalPosts, setLoading, setError]  // Add all dependencies
+    [pathname, router, searchParams, currentPage, selectedLang]
   );
-
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
     debouncedSearch(query);
   };
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('lang', selectedLang);
+    if (searchQuery) {
+      params.set('search', searchQuery);
+    }
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    setLoading(true);
+
+  }, [selectedLang]);
 
   return (
     <div className="max-w-8xl mx-auto">
@@ -337,7 +369,9 @@ export default function AllPost() {
             </TableHeader>
             <TableBody>
               {posts.map((post, index) => {
-                const descriptions = JSON.parse(post.descriptions);
+                // Parse the descriptions based on selected language
+                const descriptionsField = selectedLang === 'en' ? 'descriptions_en' : 'descriptions_de';
+                const descriptions = post[descriptionsField] ? JSON.parse(post[descriptionsField]) : JSON.parse(post.descriptions_en);
                 // Fix the row number calculation for proper sequence across pages
                 const rowNumber = index + 1;
                 return (
@@ -350,7 +384,7 @@ export default function AllPost() {
                         <CustomImage
                           width={100}
                           height={100}
-                          src={`${process.env.NEXT_PUBLIC_API_ENDPOINT}/uploads/${post.image}`}
+                          src={post.image}
                           alt="Post"
                           className="h-10 w-16 md:w-20 md:h-14 xl:h-20 xl:w-20 object-cover rounded-lg shadow-sm"
                         />

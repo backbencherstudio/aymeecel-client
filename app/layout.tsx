@@ -4,6 +4,7 @@ import "./globals.css";
 import Script from "next/script";
 import Providers from "@/providers/Providers";
 import { Toaster } from 'react-hot-toast';
+import { LanguageProvider } from '@/context/LanguageContext';
 
 
 const inter = Inter({
@@ -46,10 +47,11 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
 
-
-        <Providers>
-          {children}
-        </Providers>
+        <LanguageProvider>
+          <Providers>
+            {children}
+          </Providers>
+        </LanguageProvider>
         <Toaster position="top-center" />
       </body>
     </html>
