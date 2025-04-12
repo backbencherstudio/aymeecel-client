@@ -372,7 +372,7 @@ export default function CreatePost() {
               <div>
                 <label className="block text-sm font-medium text-gray-700">AI Description</label>
                 <Editor
-                  apiKey="87cg1pufq9d14fzlappe5kgmjxsm6u6zsgwvxigogwe80ogu"
+                  apiKey={process.env.NEXT_PUBLIC_API_KEY}
                   init={{
                     height: 300,
                     menubar: false,
@@ -390,7 +390,7 @@ export default function CreatePost() {
               <div>
                 <label className="block text-sm font-medium text-gray-700">Child Description</label>
                 <Editor
-                  apiKey="87cg1pufq9d14fzlappe5kgmjxsm6u6zsgwvxigogwe80ogu"
+                  apiKey={process.env.NEXT_PUBLIC_API_KEY}
                   init={{
                     height: 300,
                     menubar: false,
@@ -408,7 +408,7 @@ export default function CreatePost() {
               <div>
                 <label className="block text-sm font-medium text-gray-700">Teenager Description</label>
                 <Editor
-                  apiKey="87cg1pufq9d14fzlappe5kgmjxsm6u6zsgwvxigogwe80ogu"
+                  apiKey={process.env.NEXT_PUBLIC_API_KEY}
                   init={{
                     height: 300,
                     menubar: false,
@@ -426,7 +426,7 @@ export default function CreatePost() {
               <div>
                 <label className="block text-sm font-medium text-gray-700">Adult Expert Description</label>
                 <Editor
-                  apiKey="87cg1pufq9d14fzlappe5kgmjxsm6u6zsgwvxigogwe80ogu"
+                  apiKey={process.env.NEXT_PUBLIC_API_KEY}
                   init={{
                     height: 300,
                     menubar: false,
@@ -448,7 +448,7 @@ export default function CreatePost() {
               <div>
                 <label className="block text-sm font-medium text-gray-700">KI-Beschreibung</label>
                 <Editor
-                  apiKey="87cg1pufq9d14fzlappe5kgmjxsm6u6zsgwvxigogwe80ogu"
+                  apiKey={process.env.NEXT_PUBLIC_API_KEY}
                   init={{
                     height: 300,
                     menubar: false,
@@ -466,7 +466,7 @@ export default function CreatePost() {
               <div>
                 <label className="block text-sm font-medium text-gray-700">Kinder-Beschreibung</label>
                 <Editor
-                  apiKey="87cg1pufq9d14fzlappe5kgmjxsm6u6zsgwvxigogwe80ogu"
+                  apiKey={process.env.NEXT_PUBLIC_API_KEY}
                   init={{
                     height: 300,
                     menubar: false,
@@ -484,7 +484,7 @@ export default function CreatePost() {
               <div>
                 <label className="block text-sm font-medium text-gray-700">Jugendlichen-Beschreibung</label>
                 <Editor
-                  apiKey="87cg1pufq9d14fzlappe5kgmjxsm6u6zsgwvxigogwe80ogu"
+                  apiKey={process.env.NEXT_PUBLIC_API_KEY}
                   init={{
                     height: 300,
                     menubar: false,
@@ -502,7 +502,7 @@ export default function CreatePost() {
               <div>
                 <label className="block text-sm font-medium text-gray-700">Experten-Beschreibung</label>
                 <Editor
-                  apiKey="87cg1pufq9d14fzlappe5kgmjxsm6u6zsgwvxigogwe80ogu"
+                  apiKey={process.env.NEXT_PUBLIC_API_KEY}
                   init={{
                     height: 300,
                     menubar: false,
