@@ -268,7 +268,7 @@ export default function Home() {
                                                     <div className="h-4 bg-gray-200 rounded w-5/6"></div>
                                                 </div>
                                             ) : (
-                                                <div className="text-gray-700 px-5 text-[0.95rem] leading-relaxed prose prose-sm max-w-none">
+                                                <div className="text-gray-700 px-5 text-[0.95rem] leading-relaxed prose prose-sm max-w-none [&_ol]:list-decimal [&_ul]:list-disc [&_ol]:pl-[40px] [&_ul]:pl-[40px]">
                                                     {renderHTML(data[selectedImage]?.descriptions[selectedCategory] || '')}
                                                 </div>
                                             )}

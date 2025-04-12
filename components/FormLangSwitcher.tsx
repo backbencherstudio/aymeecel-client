@@ -31,7 +31,7 @@ export default function FormLangSwitcher() {
 
   return (
     <Select value={formLang} onValueChange={handleLanguageChange}>
-      <SelectTrigger className="w-[120px]">
+      <SelectTrigger className="w-[130px]">
         <SelectValue placeholder="Select language" />
       </SelectTrigger>
       <SelectContent>

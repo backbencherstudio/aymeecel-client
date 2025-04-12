@@ -110,7 +110,7 @@ export default function AllPost() {
         onOpenChange={setIsModalOpen}
       >
         <DialogContent 
-          className="modal-content-enter  max-h-[80vh] overflow-y-auto fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-white rounded-lg shadow-lg px-10 focus:outline-none"
+          className="modal-content-enter max-h-[80vh] overflow-y-auto fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-white rounded-lg shadow-lg px-10 focus:outline-none"
           onPointerDownOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={() => setIsModalOpen(false)}
         >
@@ -118,7 +118,7 @@ export default function AllPost() {
             <DialogTitle>{selectedText.field} Description</DialogTitle>
           </DialogHeader>
           <div 
-            className="mt-4 prose max-w-none"
+            className="mt-4 prose max-w-none [&_ol]:list-decimal [&_ul]:list-disc [&_ol]:pl-[40px] [&_ul]:pl-[40px]"
             dangerouslySetInnerHTML={{ __html: selectedText.text }}
           />
         </DialogContent>
@@ -556,22 +556,22 @@ export default function AllPost() {
                       </div>
                     </TableCell>
                     <TableCell className="p-4">
-                      <div className="w-full">
+                      <div className="w-full [&_ol]:list-decimal [&_ul]:list-disc [&_ol]:pl-[40px] [&_ul]:pl-[40px]">
                         {truncateText(descriptions.AI, post.id, 'AI')}
                       </div>
                     </TableCell>
                     <TableCell className="p-4">
-                      <div className="w-full">
+                      <div className="w-full [&_ol]:list-decimal [&_ul]:list-disc [&_ol]:pl-[40px] [&_ul]:pl-[40px]">
                         {truncateText(descriptions.Child, post.id, 'Child')}
                       </div>
                     </TableCell>
                     <TableCell className="p-4">
-                      <div className="w-full">
+                      <div className="w-full [&_ol]:list-decimal [&_ul]:list-disc [&_ol]:pl-[40px] [&_ul]:pl-[40px]">
                         {truncateText(descriptions.Teenager, post.id, 'Teenager')}
                       </div>
                     </TableCell>
                     <TableCell className="p-4">
-                      <div className="w-full">
+                      <div className="w-full [&_ol]:list-decimal [&_ul]:list-disc [&_ol]:pl-[40px] [&_ul]:pl-[40px]">
                         {truncateText(descriptions["Adult Expert"], post.id, 'Adult Expert')}
                       </div>
                     </TableCell>

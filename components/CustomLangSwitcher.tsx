@@ -30,7 +30,7 @@ export default function CustomLangSwitcher() {
 
   return (
     <Select value={selectedLang} onValueChange={handleLanguageChange}>
-      <SelectTrigger className="w-[120px]">
+      <SelectTrigger className="w-[130px]">
         <SelectValue placeholder="Select language" />
       </SelectTrigger>
       <SelectContent>

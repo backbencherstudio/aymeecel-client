@@ -144,10 +144,10 @@ export default function CreatePost() {
         try {
           setIsEditMode(true);
           const response = await getPostById(postId);
-          
+
           if (response.success) {
             const post = response.post;
-            
+
             // Parse English descriptions
             let descriptions_en = {
               AI: '',
@@ -155,7 +155,7 @@ export default function CreatePost() {
               Teenager: '',
               "Adult Expert": ''
             };
-            
+
             // Parse German descriptions
             let descriptions_de = {
               AI: '',
@@ -163,18 +163,18 @@ export default function CreatePost() {
               Teenager: '',
               "Adult Expert": ''
             };
-            
+
             // Handle English descriptions
             if (post.descriptions_en) {
               try {
-                descriptions_en = typeof post.descriptions_en === 'string' 
+                descriptions_en = typeof post.descriptions_en === 'string'
                   ? JSON.parse(post.descriptions_en)
                   : post.descriptions_en;
               } catch (error) {
                 console.error('Error parsing English descriptions:', error);
               }
             }
-            
+
             // Handle German descriptions
             if (post.descriptions_de) {
               try {
@@ -197,11 +197,11 @@ export default function CreatePost() {
             Object.entries(currentDescriptions).forEach(([field, value]) => {
               handleEditorChange(value, null, field as DescriptionField);
             });
-            
+
             // Set image preview if exists
             if (post.image) {
-              const imageUrl = post.image.startsWith('http') 
-                ? post.image 
+              const imageUrl = post.image.startsWith('http')
+                ? post.image
                 : `${process.env.NEXT_PUBLIC_API_ENDPOINT}/uploads/${post.image}`;
               setSelectedImage(imageUrl);
             }
@@ -223,10 +223,10 @@ export default function CreatePost() {
   // Add this effect to update editor content when switching languages
   useEffect(() => {
     if (isEditMode) {
-      const currentDescriptions = formLang === 'en' 
-        ? tempData.descriptions_en 
+      const currentDescriptions = formLang === 'en'
+        ? tempData.descriptions_en
         : tempData.descriptions_de;
-      
+
       Object.entries(currentDescriptions).forEach(([field, value]) => {
         handleEditorChange(value, null, field as DescriptionField);
       });
@@ -300,7 +300,7 @@ export default function CreatePost() {
 
       // Combine data from both languages
       const finalData: PostDescriptions = {
-        descriptions_en: formLang === 'en' 
+        descriptions_en: formLang === 'en'
           ? data.descriptions_en || tempData.descriptions_en
           : tempData.descriptions_en,
         descriptions_de: formLang === 'de'
@@ -312,7 +312,7 @@ export default function CreatePost() {
         // For update, only send the image if a new one was selected
         const imageToSend = data.image instanceof File ? data.image : undefined;
         const response = await updatePost(postId, finalData, imageToSend);
-        
+
         if (response.success) {
           toast.success('Post updated successfully');
           router.push('/dashboard/all-posts');
@@ -339,10 +339,10 @@ export default function CreatePost() {
 
   return (
     <div className="container mx-auto p-6">
-      <div className='flex justify-between items-center'>
-        <h1 className="text-2xl font-bold mb-6">
-          {isEditMode 
-            ? 'Update Post' 
+      <div className='flex flex-col md:flex-row  gap-5 mb-10 md:mb-0 justify-between items-center'>
+        <h1 className="text-xl md:text-2xl font-bold mb-6">
+          {isEditMode
+            ? 'Update Post'
             : `Create New Post - Step ${step}: ${formLang === 'en' ? 'English' : 'German'}`}
         </h1>
         <FormLangSwitcher />
