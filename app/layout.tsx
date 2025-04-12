@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Script from "next/script";
+// import Script from "next/script";
 import Providers from "@/providers/Providers";
 import { Toaster } from 'react-hot-toast';
 import { LanguageProvider } from '@/context/LanguageContext';

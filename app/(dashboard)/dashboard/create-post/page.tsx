@@ -10,20 +10,6 @@ import { useFormLanguage } from '@/context/FormLanguageContext';
 import FormLangSwitcher from '@/components/FormLangSwitcher';
 import { Editor } from '@tinymce/tinymce-react';
 
-interface PostDescriptions {
-  descriptions_en: {
-    AI: string;
-    Child: string;
-    Teenager: string;
-    "Adult Expert": string;
-  };
-  descriptions_de: {
-    AI: string;
-    Child: string;
-    Teenager: string;
-    "Adult Expert": string;
-  };
-}
 
 interface PostFormData {
   image: File | null;
@@ -53,9 +39,10 @@ interface ApiError {
 
 type DescriptionField = 'AI' | 'Child' | 'Teenager' | 'Adult Expert';
 
+
 export default function CreatePost() {
   const { formLang, setFormLang } = useFormLanguage();
-  const { register, handleSubmit, setValue, reset, formState: { errors }, clearErrors } = useForm<PostFormData>();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<PostFormData>();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState(1);
@@ -138,6 +125,34 @@ export default function CreatePost() {
     e.stopPropagation();
   };
 
+  const handleEditorChange = React.useCallback(
+    (content: string, editor: unknown, field: DescriptionField) => {
+      setTempData(prev => {
+        const newData = { ...prev };
+        if (formLang === 'en') {
+          newData.descriptions_en = {
+            ...newData.descriptions_en,
+            [field]: content
+          };
+        } else {
+          newData.descriptions_de = {
+            ...newData.descriptions_de,
+            [field]: content
+          };
+        }
+        return newData;
+      });
+
+      // Update the form value
+      if (formLang === 'en') {
+        setValue(`descriptions_en.${field}`, content, { shouldDirty: true });
+      } else {
+        setValue(`descriptions_de.${field}`, content, { shouldDirty: true });
+      }
+    },
+    [formLang, setValue]
+  );
+
   useEffect(() => {
     const fetchPost = async () => {
       if (postId) {
@@ -166,36 +181,22 @@ export default function CreatePost() {
 
             // Handle English descriptions
             if (post.descriptions_en) {
-              try {
-                descriptions_en = typeof post.descriptions_en === 'string'
-                  ? JSON.parse(post.descriptions_en)
-                  : post.descriptions_en;
-              } catch (error) {
-                console.error('Error parsing English descriptions:', error);
-              }
+              descriptions_en = typeof post.descriptions_en === 'string'
+                ? JSON.parse(post.descriptions_en)
+                : post.descriptions_en;
             }
 
             // Handle German descriptions
             if (post.descriptions_de) {
-              try {
-                descriptions_de = typeof post.descriptions_de === 'string'
-                  ? JSON.parse(post.descriptions_de)
-                  : post.descriptions_de;
-              } catch (error) {
-                console.error('Error parsing German descriptions:', error);
-              }
+              descriptions_de = typeof post.descriptions_de === 'string'
+                ? JSON.parse(post.descriptions_de)
+                : post.descriptions_de;
             }
 
             // Update the form data and temp data
             setTempData({
               descriptions_en,
               descriptions_de
-            });
-
-            // Set the editor values for the current language
-            const currentDescriptions = formLang === 'en' ? descriptions_en : descriptions_de;
-            Object.entries(currentDescriptions).forEach(([field, value]) => {
-              handleEditorChange(value, null, field as DescriptionField);
             });
 
             // Set image preview if exists
@@ -218,45 +219,7 @@ export default function CreatePost() {
     };
 
     fetchPost();
-  }, [postId, formLang]);
-
-  // Add this effect to update editor content when switching languages
-  useEffect(() => {
-    if (isEditMode) {
-      const currentDescriptions = formLang === 'en'
-        ? tempData.descriptions_en
-        : tempData.descriptions_de;
-
-      Object.entries(currentDescriptions).forEach(([field, value]) => {
-        handleEditorChange(value, null, field as DescriptionField);
-      });
-    }
-  }, [formLang, isEditMode]);
-
-  const handleEditorChange = (content: string, editor: any, field: DescriptionField) => {
-    setTempData(prev => {
-      const newData = { ...prev };
-      if (formLang === 'en') {
-        newData.descriptions_en = {
-          ...newData.descriptions_en,
-          [field]: content
-        };
-      } else {
-        newData.descriptions_de = {
-          ...newData.descriptions_de,
-          [field]: content
-        };
-      }
-      return newData;
-    });
-
-    // Update the form value
-    if (formLang === 'en') {
-      setValue(`descriptions_en.${field}`, content);
-    } else {
-      setValue(`descriptions_de.${field}`, content);
-    }
-  };
+  }, [postId]);
 
   const onSubmit = async (data: PostFormData) => {
     try {
@@ -292,20 +255,16 @@ export default function CreatePost() {
       setIsSubmitting(true);
 
       // Validate image requirement for new posts
-      if (!data.image && !isEditMode) {
+      if (!data.image && !isEditMode && !selectedImage) {
         toast.error('Please select an image');
         setIsSubmitting(false);
         return;
       }
 
       // Combine data from both languages
-      const finalData: PostDescriptions = {
-        descriptions_en: formLang === 'en'
-          ? data.descriptions_en || tempData.descriptions_en
-          : tempData.descriptions_en,
-        descriptions_de: formLang === 'de'
-          ? data.descriptions_de || tempData.descriptions_de
-          : tempData.descriptions_de
+      const finalData = {
+        descriptions_en: tempData.descriptions_en,
+        descriptions_de: tempData.descriptions_de
       };
 
       if (isEditMode && postId) {

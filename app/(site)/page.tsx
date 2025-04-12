@@ -1,6 +1,6 @@
 "use client";
 import { IoChevronUpOutline, IoChevronDownOutline, IoChevronBackOutline, IoChevronForwardOutline } from "react-icons/io5";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/footer/footer";
 import { getAllPost } from "@/apis/postDataApis";
@@ -35,15 +35,7 @@ export default function Home() {
     const [imageLoading, setImageLoading] = useState(false);
     const { selectedLang } = useLanguage();
 
-    useEffect(() => {
-        fetchPosts();
-    }, [selectedLang]);
-
-    const renderHTML = (content: string) => {
-        return <div dangerouslySetInnerHTML={{ __html: content }} />;
-    };
-
-    const fetchPosts = async () => {
+    const fetchPosts = useCallback(async () => {
         try {
             const response = await getAllPost(1, 100, selectedLang as 'en' | 'de');
             const formattedData = response?.posts?.map((post: Post) => {
@@ -82,6 +74,14 @@ export default function Home() {
             console.error('Error loading data:', error);
             setLoading(false);
         }
+    }, [selectedLang]);
+
+    useEffect(() => {
+        fetchPosts();
+    }, [fetchPosts]);
+
+    const renderHTML = (content: string) => {
+        return <div dangerouslySetInnerHTML={{ __html: content }} />;
     };
 
     const handleDotClick = (index: number) => {

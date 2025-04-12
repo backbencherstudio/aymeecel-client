@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/button"
 
 import { Search } from "lucide-react";
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import debounce from 'lodash/debounce';
+// import debounce from 'lodash/debounce';
 import CustomImage from '../../../../components/Reusable/CustomImage/CustomImage';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -326,78 +326,82 @@ export default function AllPost() {
     );
   };
 
-  // Update the debouncedSearch implementation
+  // Update the debouncedSearch implementation with proper dependencies
   const debouncedSearch = useCallback(
-    debounce(async (query: string) => {
-      try {
-        setLoading(true);
-        const response = await getAllPost(currentPage, 5, selectedLang as 'en' | 'de');
+    (query: string) => {
+      const search = async () => {
+        try {
+          setLoading(true);
+          const response = await getAllPost(currentPage, 5, selectedLang as 'en' | 'de');
 
-        if (response.success) {
-          if (query.trim()) {
-            const filteredPosts = response.posts.filter(post => {
-              const descriptionsField = selectedLang === 'en' ? 'descriptions_en' : 'descriptions_de';
-              let descriptions: Descriptions = {
-                AI: '',
-                Child: '',
-                Teenager: '',
-                "Adult Expert": ''
-              };
+          if (response.success) {
+            if (query.trim()) {
+              const filteredPosts = response.posts.filter(post => {
+                const descriptionsField = selectedLang === 'en' ? 'descriptions_en' : 'descriptions_de';
+                let descriptions: Descriptions = {
+                  AI: '',
+                  Child: '',
+                  Teenager: '',
+                  "Adult Expert": ''
+                };
 
-              try {
-                const currentDescriptions = post[descriptionsField];
-                
-                if (currentDescriptions) {
-                  if (typeof currentDescriptions === 'string') {
-                    descriptions = JSON.parse(currentDescriptions);
-                  } else {
-                    descriptions = currentDescriptions as Descriptions;
+                try {
+                  const currentDescriptions = post[descriptionsField];
+                  
+                  if (currentDescriptions) {
+                    if (typeof currentDescriptions === 'string') {
+                      descriptions = JSON.parse(currentDescriptions);
+                    } else {
+                      descriptions = currentDescriptions as Descriptions;
+                    }
+                  } else if (descriptionsField === 'descriptions_de' && post.descriptions_en) {
+                    const englishDescriptions = post.descriptions_en;
+                    if (typeof englishDescriptions === 'string') {
+                      descriptions = JSON.parse(englishDescriptions);
+                    } else {
+                      descriptions = englishDescriptions as Descriptions;
+                    }
                   }
-                } else if (descriptionsField === 'descriptions_de' && post.descriptions_en) {
-                  const englishDescriptions = post.descriptions_en;
-                  if (typeof englishDescriptions === 'string') {
-                    descriptions = JSON.parse(englishDescriptions);
-                  } else {
-                    descriptions = englishDescriptions as Descriptions;
-                  }
+
+                  const tempDiv = document.createElement('div');
+                  const searchLower = query.toLowerCase();
+                  const fields: DescriptionField[] = ['AI', 'Child', 'Teenager', 'Adult Expert'];
+
+                  return fields.some(field => {
+                    if (!descriptions[field]) return false;
+                    tempDiv.innerHTML = descriptions[field];
+                    const plainText = (tempDiv.textContent || tempDiv.innerText || '').toLowerCase();
+                    return plainText.includes(searchLower);
+                  });
+                } catch (error) {
+                  console.error('Error parsing descriptions during search:', error);
+                  return false;
                 }
+              });
 
-                const tempDiv = document.createElement('div');
-                const searchLower = query.toLowerCase();
-                const fields: DescriptionField[] = ['AI', 'Child', 'Teenager', 'Adult Expert'];
-
-                return fields.some(field => {
-                  if (!descriptions[field]) return false;
-                  tempDiv.innerHTML = descriptions[field];
-                  const plainText = (tempDiv.textContent || tempDiv.innerText || '').toLowerCase();
-                  return plainText.includes(searchLower);
-                });
-              } catch (error) {
-                console.error('Error parsing descriptions during search:', error);
-                return false;
-              }
-            });
-
-            setPosts(filteredPosts);
-            setTotalPages(1);
-            setTotalPosts(filteredPosts.length);
-          } else {
-            setPosts(response.posts);
-            setTotalPages(response.totalPages);
-            setTotalPosts(response.totalPosts);
+              setPosts(filteredPosts);
+              setTotalPages(1);
+              setTotalPosts(filteredPosts.length);
+            } else {
+              setPosts(response.posts);
+              setTotalPages(response.totalPages);
+              setTotalPosts(response.totalPosts);
+            }
           }
+        } catch (error) {
+          console.error('Search error:', error);
+          const errorMessage = error instanceof Error ? error.message : 'Failed to search posts';
+          toast.error(errorMessage);
+          setError(errorMessage);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error('Search error:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Failed to search posts';
-        toast.error(errorMessage);
-        setError(errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    }, 500),
-    [pathname, router, searchParams, currentPage, selectedLang]
+      };
+      search();
+    },
+    [currentPage, selectedLang] // Add required dependencies
   );
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -413,7 +417,7 @@ export default function AllPost() {
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
     setLoading(true);
 
-  }, [selectedLang]);
+  }, [selectedLang, pathname, router, searchParams, searchQuery]); // Add missing dependencies
 
   return (
     <div className="max-w-8xl mx-auto">
