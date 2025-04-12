@@ -8,6 +8,7 @@ import { IoCloseCircle } from 'react-icons/io5';
 import CustomImage from '@/components/Reusable/CustomImage/CustomImage';
 import { useFormLanguage } from '@/context/FormLanguageContext';
 import FormLangSwitcher from '@/components/FormLangSwitcher';
+import { Editor } from '@tinymce/tinymce-react';
 
 interface PostDescriptions {
   descriptions_en: {
@@ -49,6 +50,8 @@ interface ApiError {
   };
   message?: string;
 }
+
+type DescriptionField = 'AI' | 'Child' | 'Teenager' | 'Adult Expert';
 
 export default function CreatePost() {
   const { formLang, setFormLang } = useFormLanguage();
@@ -145,102 +148,62 @@ export default function CreatePost() {
           if (response.success) {
             const post = response.post;
             
-            // Parse descriptions based on what's available
-            let descriptions_en: {
-              AI: string;
-              Child: string;
-              Teenager: string;
-              "Adult Expert": string;
-            } = {
+            // Parse English descriptions
+            let descriptions_en = {
               AI: '',
               Child: '',
               Teenager: '',
               "Adult Expert": ''
             };
             
-            let descriptions_de: {
-              AI: string;
-              Child: string;
-              Teenager: string;
-              "Adult Expert": string;
-            } = {
+            // Parse German descriptions
+            let descriptions_de = {
               AI: '',
               Child: '',
               Teenager: '',
               "Adult Expert": ''
             };
             
-            // Handle different possible formats of descriptions
+            // Handle English descriptions
             if (post.descriptions_en) {
-              const parsedDescEn = typeof post.descriptions_en === 'string' 
-                ? JSON.parse(post.descriptions_en) 
-                : post.descriptions_en;
-                
-              descriptions_en = {
-                AI: parsedDescEn.AI || '',
-                Child: parsedDescEn.Child || '',
-                Teenager: parsedDescEn.Teenager || '',
-                "Adult Expert": parsedDescEn["Adult Expert"] || ''
-              };
+              try {
+                descriptions_en = typeof post.descriptions_en === 'string' 
+                  ? JSON.parse(post.descriptions_en)
+                  : post.descriptions_en;
+              } catch (error) {
+                console.error('Error parsing English descriptions:', error);
+              }
             }
             
+            // Handle German descriptions
             if (post.descriptions_de) {
-              const parsedDescDe = typeof post.descriptions_de === 'string' 
-                ? JSON.parse(post.descriptions_de) 
-                : post.descriptions_de;
-                
-              descriptions_de = {
-                AI: parsedDescDe.AI || '',
-                Child: parsedDescDe.Child || '',
-                Teenager: parsedDescDe.Teenager || '',
-                "Adult Expert": parsedDescDe["Adult Expert"] || ''
-              };
-            } else if (post.descriptions) {
-              // Legacy format or fallback
-              const allDescriptions = typeof post.descriptions === 'string' 
-                ? JSON.parse(post.descriptions) 
-                : post.descriptions;
-                
-              if (allDescriptions.descriptions_en) {
-                const parsedDescEn = allDescriptions.descriptions_en;
-                descriptions_en = {
-                  AI: parsedDescEn.AI || '',
-                  Child: parsedDescEn.Child || '',
-                  Teenager: parsedDescEn.Teenager || '',
-                  "Adult Expert": parsedDescEn["Adult Expert"] || ''
-                };
-              }
-              
-              if (allDescriptions.descriptions_de) {
-                const parsedDescDe = allDescriptions.descriptions_de;
-                descriptions_de = {
-                  AI: parsedDescDe.AI || '',
-                  Child: parsedDescDe.Child || '',
-                  Teenager: parsedDescDe.Teenager || '',
-                  "Adult Expert": parsedDescDe["Adult Expert"] || ''
-                };
+              try {
+                descriptions_de = typeof post.descriptions_de === 'string'
+                  ? JSON.parse(post.descriptions_de)
+                  : post.descriptions_de;
+              } catch (error) {
+                console.error('Error parsing German descriptions:', error);
               }
             }
-            
-            // Set form values with properly typed objects
-            const formData = {
+
+            // Update the form data and temp data
+            setTempData({
               descriptions_en,
               descriptions_de
-            };
-            
-            // Set form values
-            reset(formData);
-            setTempData(formData);
+            });
+
+            // Set the editor values for the current language
+            const currentDescriptions = formLang === 'en' ? descriptions_en : descriptions_de;
+            Object.entries(currentDescriptions).forEach(([field, value]) => {
+              handleEditorChange(value, null, field as DescriptionField);
+            });
             
             // Set image preview if exists
             if (post.image) {
-              // Check if image is a full URL or just a filename
               const imageUrl = post.image.startsWith('http') 
                 ? post.image 
                 : `${process.env.NEXT_PUBLIC_API_ENDPOINT}/uploads/${post.image}`;
-                
               setSelectedImage(imageUrl);
-              clearErrors('image');
             }
           }
         } catch (error) {
@@ -255,29 +218,49 @@ export default function CreatePost() {
     };
 
     fetchPost();
-  }, [postId, reset, clearErrors]);
+  }, [postId, formLang]);
 
-  // Add this useEffect to handle language switching in edit mode
+  // Add this effect to update editor content when switching languages
   useEffect(() => {
     if (isEditMode) {
-      // When language changes in edit mode, make sure the form shows the correct language data
-      if (formLang === 'en') {
-        reset({
-          descriptions_en: tempData.descriptions_en,
-          descriptions_de: null
-        });
-      } else {
-        reset({
-          descriptions_en: null,
-          descriptions_de: tempData.descriptions_de
-        });
-      }
+      const currentDescriptions = formLang === 'en' 
+        ? tempData.descriptions_en 
+        : tempData.descriptions_de;
+      
+      Object.entries(currentDescriptions).forEach(([field, value]) => {
+        handleEditorChange(value, null, field as DescriptionField);
+      });
     }
-  }, [formLang, isEditMode, reset, tempData]);
+  }, [formLang, isEditMode]);
+
+  const handleEditorChange = (content: string, editor: any, field: DescriptionField) => {
+    setTempData(prev => {
+      const newData = { ...prev };
+      if (formLang === 'en') {
+        newData.descriptions_en = {
+          ...newData.descriptions_en,
+          [field]: content
+        };
+      } else {
+        newData.descriptions_de = {
+          ...newData.descriptions_de,
+          [field]: content
+        };
+      }
+      return newData;
+    });
+
+    // Update the form value
+    if (formLang === 'en') {
+      setValue(`descriptions_en.${field}`, content);
+    } else {
+      setValue(`descriptions_de.${field}`, content);
+    }
+  };
 
   const onSubmit = async (data: PostFormData) => {
     try {
-      if (step === 1) {
+      if (step === 1 && !isEditMode) {
         // Store the current language data
         if (formLang === 'en') {
           setTempData(prev => ({
@@ -302,29 +285,22 @@ export default function CreatePost() {
           }));
           setFormLang('en');
         }
-
-        // Reset form for the next language but keep the image
-        reset({
-          image: data.image,
-          descriptions_en: formLang === 'de' ? tempData.descriptions_en : data.descriptions_en,
-          descriptions_de: formLang === 'en' ? tempData.descriptions_de : data.descriptions_de
-        });
-
         setStep(2);
         return;
       }
 
       setIsSubmitting(true);
 
+      // Validate image requirement for new posts
       if (!data.image && !isEditMode) {
         toast.error('Please select an image');
         setIsSubmitting(false);
         return;
       }
 
-      // Combine data from both steps
+      // Combine data from both languages
       const finalData: PostDescriptions = {
-        descriptions_en: formLang === 'en'
+        descriptions_en: formLang === 'en' 
           ? data.descriptions_en || tempData.descriptions_en
           : tempData.descriptions_en,
         descriptions_de: formLang === 'de'
@@ -333,39 +309,19 @@ export default function CreatePost() {
       };
 
       if (isEditMode && postId) {
-        const response = await updatePost(postId, finalData, data.image || undefined);
+        // For update, only send the image if a new one was selected
+        const imageToSend = data.image instanceof File ? data.image : undefined;
+        const response = await updatePost(postId, finalData, imageToSend);
+        
         if (response.success) {
           toast.success('Post updated successfully');
           router.push('/dashboard/all-posts');
         }
       } else {
+        // For create, image is required
         const response = await createPost(finalData, data.image!);
         if (response.success) {
           toast.success(response.message);
-          reset({
-            image: null,
-            descriptions_en: null,
-            descriptions_de: null
-          });
-          setSelectedImage(null);
-          setStep(1);
-          setTempData({
-            descriptions_en: {
-              AI: '',
-              Child: '',
-              Teenager: '',
-              "Adult Expert": ''
-            },
-            descriptions_de: {
-              AI: '',
-              Child: '',
-              Teenager: '',
-              "Adult Expert": ''
-            }
-          });
-          if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-          }
           router.push('/dashboard/all-posts');
         }
       }
@@ -456,34 +412,74 @@ export default function CreatePost() {
               <h2 className="text-lg font-semibold">English Descriptions</h2>
               <div>
                 <label className="block text-sm font-medium text-gray-700">AI Description</label>
-                <textarea
-                  {...register('descriptions_en.AI')}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  rows={4}
+                <Editor
+                  apiKey="87cg1pufq9d14fzlappe5kgmjxsm6u6zsgwvxigogwe80ogu"
+                  init={{
+                    height: 300,
+                    menubar: false,
+                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'],
+                    toolbar: 'undo redo | blocks | bold italic | ' +
+                      'alignleft aligncenter alignright alignjustify | ' +
+                      'bullist numlist outdent indent | removeformat | help'
+                  }}
+                  value={tempData.descriptions_en.AI}
+                  onEditorChange={(content, editor) => handleEditorChange(content, editor, 'AI')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Child Description</label>
-                <textarea
-                  {...register('descriptions_en.Child')}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  rows={4}
+                <Editor
+                  apiKey="87cg1pufq9d14fzlappe5kgmjxsm6u6zsgwvxigogwe80ogu"
+                  init={{
+                    height: 300,
+                    menubar: false,
+                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'],
+                    toolbar: 'undo redo | blocks | bold italic | ' +
+                      'alignleft aligncenter alignright alignjustify | ' +
+                      'bullist numlist outdent indent | removeformat | help'
+                  }}
+                  value={tempData.descriptions_en.Child}
+                  onEditorChange={(content, editor) => handleEditorChange(content, editor, 'Child')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Teenager Description</label>
-                <textarea
-                  {...register('descriptions_en.Teenager')}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  rows={4}
+                <Editor
+                  apiKey="87cg1pufq9d14fzlappe5kgmjxsm6u6zsgwvxigogwe80ogu"
+                  init={{
+                    height: 300,
+                    menubar: false,
+                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'],
+                    toolbar: 'undo redo | blocks | bold italic | ' +
+                      'alignleft aligncenter alignright alignjustify | ' +
+                      'bullist numlist outdent indent | removeformat | help'
+                  }}
+                  value={tempData.descriptions_en.Teenager}
+                  onEditorChange={(content, editor) => handleEditorChange(content, editor, 'Teenager')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Adult Expert Description</label>
-                <textarea
-                  {...register('descriptions_en.Adult Expert')}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  rows={4}
+                <Editor
+                  apiKey="87cg1pufq9d14fzlappe5kgmjxsm6u6zsgwvxigogwe80ogu"
+                  init={{
+                    height: 300,
+                    menubar: false,
+                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'],
+                    toolbar: 'undo redo | blocks | bold italic | ' +
+                      'alignleft aligncenter alignright alignjustify | ' +
+                      'bullist numlist outdent indent | removeformat | help'
+                  }}
+                  value={tempData.descriptions_en["Adult Expert"]}
+                  onEditorChange={(content, editor) => handleEditorChange(content, editor, "Adult Expert")}
                 />
               </div>
             </div>
@@ -492,34 +488,74 @@ export default function CreatePost() {
               <h2 className="text-lg font-semibold">Deutsche Beschreibungen</h2>
               <div>
                 <label className="block text-sm font-medium text-gray-700">KI-Beschreibung</label>
-                <textarea
-                  {...register('descriptions_de.AI')}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  rows={4}
+                <Editor
+                  apiKey="87cg1pufq9d14fzlappe5kgmjxsm6u6zsgwvxigogwe80ogu"
+                  init={{
+                    height: 300,
+                    menubar: false,
+                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'],
+                    toolbar: 'undo redo | blocks | bold italic | ' +
+                      'alignleft aligncenter alignright alignjustify | ' +
+                      'bullist numlist outdent indent | removeformat | help'
+                  }}
+                  value={tempData.descriptions_de.AI}
+                  onEditorChange={(content, editor) => handleEditorChange(content, editor, 'AI')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Kinder-Beschreibung</label>
-                <textarea
-                  {...register('descriptions_de.Child')}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  rows={4}
+                <Editor
+                  apiKey="87cg1pufq9d14fzlappe5kgmjxsm6u6zsgwvxigogwe80ogu"
+                  init={{
+                    height: 300,
+                    menubar: false,
+                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'],
+                    toolbar: 'undo redo | blocks | bold italic | ' +
+                      'alignleft aligncenter alignright alignjustify | ' +
+                      'bullist numlist outdent indent | removeformat | help'
+                  }}
+                  value={tempData.descriptions_de.Child}
+                  onEditorChange={(content, editor) => handleEditorChange(content, editor, 'Child')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Jugendlichen-Beschreibung</label>
-                <textarea
-                  {...register('descriptions_de.Teenager')}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  rows={4}
+                <Editor
+                  apiKey="87cg1pufq9d14fzlappe5kgmjxsm6u6zsgwvxigogwe80ogu"
+                  init={{
+                    height: 300,
+                    menubar: false,
+                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'],
+                    toolbar: 'undo redo | blocks | bold italic | ' +
+                      'alignleft aligncenter alignright alignjustify | ' +
+                      'bullist numlist outdent indent | removeformat | help'
+                  }}
+                  value={tempData.descriptions_de.Teenager}
+                  onEditorChange={(content, editor) => handleEditorChange(content, editor, 'Teenager')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Experten-Beschreibung</label>
-                <textarea
-                  {...register('descriptions_de.Adult Expert')}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  rows={4}
+                <Editor
+                  apiKey="87cg1pufq9d14fzlappe5kgmjxsm6u6zsgwvxigogwe80ogu"
+                  init={{
+                    height: 300,
+                    menubar: false,
+                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'],
+                    toolbar: 'undo redo | blocks | bold italic | ' +
+                      'alignleft aligncenter alignright alignjustify | ' +
+                      'bullist numlist outdent indent | removeformat | help'
+                  }}
+                  value={tempData.descriptions_de["Adult Expert"]}
+                  onEditorChange={(content, editor) => handleEditorChange(content, editor, "Adult Expert")}
                 />
               </div>
             </div>

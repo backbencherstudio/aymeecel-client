@@ -32,11 +32,11 @@ export default function Footer() {
                     <div className="flex items-center">
                         <ul className="flex space-x-6">
                             <li>
-                                <Link href="/" className="text-sm text-gray-600 hover:text-gray-800">
+                                <Link href="https://www.uzh.ch/de/privacy" target="_blank" className="text-sm text-gray-600 hover:text-gray-800">
                                     Privacy Policy
                                 </Link>
                             </li>
-                            <li>
+                            {/* <li>
                                 <Link href="/" className="text-sm text-gray-600 hover:text-gray-800">
                                     Terms of Service
                                 </Link>
@@ -45,7 +45,7 @@ export default function Footer() {
                                 <Link href="/" className="text-sm text-gray-600 hover:text-gray-800">
                                     Cookies Settings
                                 </Link>
-                            </li>
+                            </li> */}
                         </ul>
                     </div>
                     <div>

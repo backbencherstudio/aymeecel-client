@@ -39,13 +39,36 @@ export default function Home() {
         fetchPosts();
     }, [selectedLang]);
 
+    const renderHTML = (content: string) => {
+        return <div dangerouslySetInnerHTML={{ __html: content }} />;
+    };
+
     const fetchPosts = async () => {
         try {
             const response = await getAllPost(1, 100, selectedLang as 'en' | 'de');
             const formattedData = response?.posts?.map((post: Post) => {
-                // Parse the descriptions based on selected language
                 const descriptionsField = selectedLang === 'en' ? 'descriptions_en' : 'descriptions_de';
-                const descriptions = post[descriptionsField] ? JSON.parse(post[descriptionsField]) : JSON.parse(post.descriptions_en);
+                let descriptions;
+                try {
+                    descriptions = typeof post[descriptionsField] === 'string'
+                        ? JSON.parse(post[descriptionsField])
+                        : post[descriptionsField];
+                    
+                    // Fallback to English if German is not available
+                    if (!descriptions && descriptionsField === 'descriptions_de') {
+                        descriptions = typeof post.descriptions_en === 'string'
+                            ? JSON.parse(post.descriptions_en)
+                            : post.descriptions_en;
+                    }
+                } catch (error) {
+                    console.error('Error parsing descriptions:', error);
+                    descriptions = {
+                        AI: '',
+                        Child: '',
+                        Teenager: '',
+                        "Adult Expert": ''
+                    };
+                }
                 
                 return {
                     id: post.id,
@@ -245,9 +268,9 @@ export default function Home() {
                                                     <div className="h-4 bg-gray-200 rounded w-5/6"></div>
                                                 </div>
                                             ) : (
-                                                <p className="text-gray-700 text-[0.95rem] leading-relaxed">
-                                                    {data[selectedImage]?.descriptions[selectedCategory]}
-                                                </p>
+                                                <div className="text-gray-700 px-5 text-[0.95rem] leading-relaxed prose prose-sm max-w-none">
+                                                    {renderHTML(data[selectedImage]?.descriptions[selectedCategory] || '')}
+                                                </div>
                                             )}
                                         </div>
                                     </div>

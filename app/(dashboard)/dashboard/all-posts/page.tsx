@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { deletePost, getAllPost } from '@/apis/postDataApis';
 import { toast } from 'react-hot-toast';
 import {
@@ -27,16 +27,25 @@ import { Button } from "@/components/ui/button"
 
 import { Search } from "lucide-react";
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { useCallback } from 'react';
 import debounce from 'lodash/debounce';
 import CustomImage from '../../../../components/Reusable/CustomImage/CustomImage';
 import { useLanguage } from '@/context/LanguageContext';
 
+// Update the type definition
+type DescriptionField = 'AI' | 'Child' | 'Teenager' | 'Adult Expert';
+
+interface Descriptions {
+  AI: string;
+  Child: string;
+  Teenager: string;
+  "Adult Expert": string;
+}
+
 interface Post {
   id: string;
   image: string;
-  descriptions_en: string;
-  descriptions_de: string;
+  descriptions_en: string | Descriptions;
+  descriptions_de: string | Descriptions;
   createdAt: string;
   updatedAt: string;
 }
@@ -58,14 +67,28 @@ export default function AllPost() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
   const { selectedLang } = useLanguage();
-  const truncateText = (text: string, id: string, field: string) => {
-    const maxLength = 20;
 
-    if (text.length <= maxLength) return text;
+  // Update the truncateText function with proper typing
+  const truncateText = (text: string, id: string, field: DescriptionField) => {
+    const maxLength = 10;
+
+    // Create a temporary div to parse HTML content
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = text;
+    const plainText = tempDiv.textContent || tempDiv.innerText || '';
+
+    if (plainText.length <= maxLength) {
+      return <div dangerouslySetInnerHTML={{ __html: text }} />;
+    }
+
+    // Get the first 10 characters of plain text
+    const truncatedText = plainText.slice(0, maxLength);
 
     return (
       <div className="flex items-center space-x-1">
-        <span className="truncate">{text.slice(0, maxLength)}...</span>
+        <div className="truncate">
+          {truncatedText}...
+        </div>
         <button
           onClick={() => {
             setSelectedText({ text, field });
@@ -79,18 +102,25 @@ export default function AllPost() {
     );
   };
 
-
-  // In DescriptionModal component
+  // Update the DescriptionModal to handle HTML content
   const DescriptionModal = () => {
     return (
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="modal-content-enter max-h-[80vh] overflow-y-auto">
+      <Dialog 
+        open={isModalOpen} 
+        onOpenChange={setIsModalOpen}
+      >
+        <DialogContent 
+          className="modal-content-enter  max-h-[80vh] overflow-y-auto fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] bg-white rounded-lg shadow-lg px-10 focus:outline-none"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={() => setIsModalOpen(false)}
+        >
           <DialogHeader>
             <DialogTitle>{selectedText.field} Description</DialogTitle>
           </DialogHeader>
-          <div className="mt-4 whitespace-pre-wrap break-words">
-            {selectedText.text}
-          </div>
+          <div 
+            className="mt-4 prose max-w-none"
+            dangerouslySetInnerHTML={{ __html: selectedText.text }}
+          />
         </DialogContent>
       </Dialog>
     );
@@ -174,16 +204,57 @@ export default function AllPost() {
     );
   };
 
-  // Add this function before the return statement
-  const handleEdit = (postId: string) => {
-    router.push(`/dashboard/create-post?id=${postId}`);
-  };
-
-  // In DeleteConfirmationModal component
+  // Update the DeleteConfirmationModal component
   const DeleteConfirmationModal = () => {
+    const handleClose = useCallback(() => {
+      setIsDeleteModalOpen(false);
+      setPostToDelete(null);
+    }, []);
+
+    const handleDeleteConfirm = async () => {
+      if (!postToDelete) return;
+      
+      try {
+        setLoading(true);
+        const response = await deletePost(postToDelete);
+        
+        if (response.success) {
+          toast.success('Post deleted successfully');
+          handleClose();
+          
+          // Recalculate current page if it's the last item on the page
+          const newCurrentPage = posts.length === 1 && currentPage > 1 
+            ? currentPage - 1 
+            : currentPage;
+          
+          // Fetch updated posts
+          const updatedResponse = await getAllPost(newCurrentPage, 5, selectedLang as 'en' | 'de');
+          if (updatedResponse.success) {
+            setPosts(updatedResponse.posts);
+            setTotalPages(updatedResponse.totalPages);
+            setTotalPosts(updatedResponse.totalPosts);
+            setCurrentPage(newCurrentPage);
+          }
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to delete post';
+        toast.error(errorMessage);
+      } finally {
+        setLoading(false);
+        handleClose();
+      }
+    };
+
     return (
-      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-        <DialogContent className="modal-content-enter">
+      <Dialog 
+        open={isDeleteModalOpen} 
+        onOpenChange={handleClose}
+      >
+        <DialogContent 
+          className="sm:max-w-[425px] bg-white"
+          onEscapeKeyDown={handleClose}
+          onInteractOutside={handleClose}
+        >
           <DialogHeader>
             <DialogTitle>Confirm Deletion</DialogTitle>
           </DialogHeader>
@@ -192,20 +263,29 @@ export default function AllPost() {
             <div className="flex justify-end gap-3 mt-6">
               <Button
                 variant="outline"
-                onClick={() => setIsDeleteModalOpen(false)}
+                onClick={handleClose}
+                type="button"
+                disabled={loading}
               >
                 Cancel
               </Button>
               <Button
                 variant="destructive"
-                onClick={() => {
-                  if (postToDelete) {
-                    handleDelete(postToDelete);
-                    setIsDeleteModalOpen(false);
-                  }
-                }}
+                onClick={handleDeleteConfirm}
+                type="button"
+                disabled={loading}
               >
-                Delete
+                {loading ? (
+                  <span className="flex items-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Deleting...
+                  </span>
+                ) : (
+                  'Delete'
+                )}
               </Button>
             </div>
           </div>
@@ -214,70 +294,92 @@ export default function AllPost() {
     );
   };
 
-  // Modify the handleDelete function
-  const handleDelete = async (postId: string) => {
-    try {
-      const response = await deletePost(postId);
-      if (response.success) {
-        toast.success('Post deleted successfully');
-        // Refresh the posts list with correct parameters
-        const updatedResponse = await getAllPost(currentPage, 5, selectedLang as 'en' | 'de');
-        if (updatedResponse.success) {
-          setPosts(updatedResponse.posts);
-          setTotalPages(updatedResponse.totalPages);
-          setTotalPosts(updatedResponse.totalPosts);
-        }
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to delete post';
-      toast.error(errorMessage);
-    } finally {
-      setPostToDelete(null);
-    }
+  const TableActions = ({ post }: { post: Post }) => {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            onClick={() => router.push(`/dashboard/create-post?id=${post.id}`)}
+            className="cursor-pointer"
+          >
+            <Pencil className="mr-2 h-4 w-4" />
+            Update
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              setPostToDelete(post.id);
+              setIsDeleteModalOpen(true);
+            }}
+            className="cursor-pointer text-red-600"
+          >
+            <Trash className="mr-2 h-4 w-4" />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
   };
 
   // Update the debouncedSearch implementation
-
   const debouncedSearch = useCallback(
     debounce(async (query: string) => {
       try {
         setLoading(true);
-        const params = new URLSearchParams(searchParams.toString());
-
-        // Set language parameter
-        params.set('lang', selectedLang);
-
-        // Set search parameter if it exists
-        if (query) {
-          params.set('search', query);
-        } else {
-          params.delete('search');
-        }
-
-        router.push(`${pathname}?${params.toString()}`, { scroll: false });
-
-        // Get all posts first
         const response = await getAllPost(currentPage, 5, selectedLang as 'en' | 'de');
 
         if (response.success) {
           if (query.trim()) {
-            // Client-side filtering based on the selected language
             const filteredPosts = response.posts.filter(post => {
               const descriptionsField = selectedLang === 'en' ? 'descriptions_en' : 'descriptions_de';
-              const descriptions = post[descriptionsField] ? JSON.parse(post[descriptionsField]) : JSON.parse(post.descriptions_en);
+              let descriptions: Descriptions = {
+                AI: '',
+                Child: '',
+                Teenager: '',
+                "Adult Expert": ''
+              };
 
-              // Search in all description fields
-              const searchLower = query.toLowerCase();
-              return (
-                descriptions.AI.toLowerCase().includes(searchLower) ||
-                descriptions.Child.toLowerCase().includes(searchLower) ||
-                descriptions.Teenager.toLowerCase().includes(searchLower) ||
-                descriptions["Adult Expert"].toLowerCase().includes(searchLower)
-              );
+              try {
+                const currentDescriptions = post[descriptionsField];
+                
+                if (currentDescriptions) {
+                  if (typeof currentDescriptions === 'string') {
+                    descriptions = JSON.parse(currentDescriptions);
+                  } else {
+                    descriptions = currentDescriptions as Descriptions;
+                  }
+                } else if (descriptionsField === 'descriptions_de' && post.descriptions_en) {
+                  const englishDescriptions = post.descriptions_en;
+                  if (typeof englishDescriptions === 'string') {
+                    descriptions = JSON.parse(englishDescriptions);
+                  } else {
+                    descriptions = englishDescriptions as Descriptions;
+                  }
+                }
+
+                const tempDiv = document.createElement('div');
+                const searchLower = query.toLowerCase();
+                const fields: DescriptionField[] = ['AI', 'Child', 'Teenager', 'Adult Expert'];
+
+                return fields.some(field => {
+                  if (!descriptions[field]) return false;
+                  tempDiv.innerHTML = descriptions[field];
+                  const plainText = (tempDiv.textContent || tempDiv.innerText || '').toLowerCase();
+                  return plainText.includes(searchLower);
+                });
+              } catch (error) {
+                console.error('Error parsing descriptions during search:', error);
+                return false;
+              }
             });
 
             setPosts(filteredPosts);
-            setTotalPages(1); 
+            setTotalPages(1);
             setTotalPosts(filteredPosts.length);
           } else {
             setPosts(response.posts);
@@ -369,9 +471,72 @@ export default function AllPost() {
             </TableHeader>
             <TableBody>
               {posts.map((post, index) => {
-                // Parse the descriptions based on selected language
                 const descriptionsField = selectedLang === 'en' ? 'descriptions_en' : 'descriptions_de';
-                const descriptions = post[descriptionsField] ? JSON.parse(post[descriptionsField]) : JSON.parse(post.descriptions_en);
+                let descriptions: Descriptions = {
+                  AI: '',
+                  Child: '',
+                  Teenager: '',
+                  "Adult Expert": ''
+                };
+                
+                try {
+                  const currentDescriptions = post[descriptionsField];
+                  
+                  // Check if descriptions exist and handle parsing
+                  if (currentDescriptions) {
+                    if (typeof currentDescriptions === 'string') {
+                      try {
+                        descriptions = JSON.parse(currentDescriptions);
+                      } catch (parseError) {
+                        console.error('Error parsing JSON:', parseError);
+                        descriptions = {
+                          AI: 'Error loading content',
+                          Child: 'Error loading content',
+                          Teenager: 'Error loading content',
+                          "Adult Expert": 'Error loading content'
+                        };
+                      }
+                    } else {
+                      descriptions = currentDescriptions as Descriptions;
+                    }
+                  } else if (descriptionsField === 'descriptions_de' && post.descriptions_en) {
+                    // Fallback to English if German is not available
+                    const englishDescriptions = post.descriptions_en;
+                    if (typeof englishDescriptions === 'string') {
+                      try {
+                        descriptions = JSON.parse(englishDescriptions);
+                      } catch (parseError) {
+                        console.error('Error parsing English fallback:', parseError);
+                        descriptions = {
+                          AI: 'Error loading content',
+                          Child: 'Error loading content',
+                          Teenager: 'Error loading content',
+                          "Adult Expert": 'Error loading content'
+                        };
+                      }
+                    } else {
+                      descriptions = englishDescriptions as Descriptions;
+                    }
+                  }
+
+                  // Validate that all required fields exist
+                  const requiredFields: DescriptionField[] = ['AI', 'Child', 'Teenager', 'Adult Expert'];
+                  requiredFields.forEach(field => {
+                    if (!descriptions[field]) {
+                      descriptions[field] = '';
+                    }
+                  });
+
+                } catch (error) {
+                  console.error('Error processing descriptions:', error);
+                  descriptions = {
+                    AI: 'Error loading content',
+                    Child: 'Error loading content',
+                    Teenager: 'Error loading content',
+                    "Adult Expert": 'Error loading content'
+                  };
+                }
+
                 // Fix the row number calculation for proper sequence across pages
                 const rowNumber = index + 1;
                 return (
@@ -407,40 +572,14 @@ export default function AllPost() {
                     </TableCell>
                     <TableCell className="p-4">
                       <div className="w-full">
-                        {truncateText(descriptions["Adult Expert"], post.id, 'Adult')}
+                        {truncateText(descriptions["Adult Expert"], post.id, 'Adult Expert')}
                       </div>
                     </TableCell>
                     <TableCell className="p-4 whitespace-nowrap">
                       {new Date(post.createdAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 cursor-pointer w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => handleEdit(post.id)}
-                            className="cursor-pointer"
-                          >
-                            <Pencil className="mr-2 h-4 w-4" />
-                            Update
-                          </DropdownMenuItem>
-
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setPostToDelete(post.id);
-                              setIsDeleteModalOpen(true);
-                            }}
-                            className="cursor-pointer text-red-600"
-                          >
-                            <Trash className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <TableActions post={post} />
                     </TableCell>
                   </TableRow>
                 );

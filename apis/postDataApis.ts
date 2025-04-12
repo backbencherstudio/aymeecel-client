@@ -97,15 +97,15 @@ export const deletePost = async (postId: string) => {
 export const updatePost = async (postId: string, descriptions: PostDescriptions, image?: File) => {
     try {
         const formData = new FormData();
-        if (image) {
+        
+        // Only append image if it exists and is a File object
+        if (image instanceof File) {
             formData.append('image', image);
         }
         
         // Append descriptions for both languages
         formData.append('descriptions_en', JSON.stringify(descriptions.descriptions_en));
-        if (descriptions.descriptions_de) {
-            formData.append('descriptions_de', JSON.stringify(descriptions.descriptions_de));
-        }
+        formData.append('descriptions_de', JSON.stringify(descriptions.descriptions_de));
 
         const response = await axiosClient.put(`/posts/${postId}`, formData, {
             headers: {
