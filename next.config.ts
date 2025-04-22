@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'bbsserver.zapto.org',
+        hostname: 'slovakia-he-iii-communities.trycloudflare.com',
         pathname: '/uploads/**',
       },
       {
@@ -23,6 +23,7 @@ const nextConfig: NextConfig = {
         port: '4000',
         pathname: '/uploads/**',
       }
+
     ],
   },
 };
