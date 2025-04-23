@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'slovakia-he-iii-communities.trycloudflare.com',
+        hostname: 'estate-refrigerator-ancient-careful.trycloudflare.com',
         pathname: '/uploads/**',
       },
       {
