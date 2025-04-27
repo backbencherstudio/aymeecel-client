@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'estate-refrigerator-ancient-careful.trycloudflare.com',
+        hostname: 'aymeecel-backend.signalsmind.com',
         pathname: '/uploads/**',
       },
       {

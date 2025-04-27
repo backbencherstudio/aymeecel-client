@@ -10,7 +10,6 @@ interface ApiError {
   message?: string;
 }
 
-// Function to handle login API request
 export const loginUser = async (email: string, password: string) => {
     try {
         const response = await axiosClient.post('/users/login', {
