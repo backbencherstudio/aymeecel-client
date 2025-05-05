@@ -45,7 +45,7 @@ export default function Home() {
                     descriptions = typeof post[descriptionsField] === 'string'
                         ? JSON.parse(post[descriptionsField])
                         : post[descriptionsField];
-                    
+
                     // Fallback to English if German is not available
                     if (!descriptions && descriptionsField === 'descriptions_de') {
                         descriptions = typeof post.descriptions_en === 'string'
@@ -61,7 +61,7 @@ export default function Home() {
                         "Adult Expert": ''
                     };
                 }
-                
+
                 return {
                     id: post.id,
                     image: post.image,
@@ -101,10 +101,37 @@ export default function Home() {
 
     return (
         <>
+
             <div className="bg-[linear-gradient(118deg,#9ABFBD_-1.71%,#EEF0EB_55.76%,#B69E93_100%)] min-h-screen px-2 sm:px-5 xl:px-0">
                 <Navbar />
-                <div className="flex justify-center py-10 xl:mt-0  items-center xl:min-h-[calc(100vh-150px)]">
-                    <div className="bg-transparent border-2 border-[#FFFFFF33] rounded-[2rem] shadow-lg max-w-5xl w-full">
+
+                {/* welcome card  */}
+                <div className="max-w-5xl mx-auto px-2 sm:px-5 xl:px-0 py-8">
+                    <div className="rounded-[40px] bg-white/20 px-4 py-8 sm:p-8 lg:p-[64px] relative overflow-hidden shadow-[inset_0px_-6px_20.8px_rgba(255,255,255,0.60)] w-full">
+                        <h1 className="text-[32px] lg:text-[56px] font-[700] mb-4">Welcome!</h1>
+                        <p className="mb-4 text-[16px] md:text-[18px] font-[400] leading-[27px]">
+                            For the 500 th anniversary of the "Prophezy" we at the Faculty of Theology and Religious
+                            Studies and the URPP in Digital Religion(s) at the University of Zurich have explored how
+                            religious objects from 1500-1600 are seen through several different kinds of eyes: those
+                            of humans – a child, a teenager, and religious experts – and the digital 'eyes' of Artificial
+                            Intelligence.
+                        </p>
+                        <p className="mb-4 text-[16px] md:text-[18px] font-[400] leading-[27px]">
+                            You can click the labelled buttons below and compare these different ways of 'seeing' and
+                            develop your own conclusions about how we gain knowledge about religion in an
+                            increasingly AI filtered world.
+                        </p>
+                        <p className="text-sm font-[400] italic">
+                            Images granted by the generosity of the Rettberg Museum and Wikimedia commons, and used under creative
+                            commons license CC BY-SA 2.0
+                        </p>
+                    </div>
+                </div>
+
+
+                {/* main card */}
+                <div className="max-w-5xl mx-auto px-2 sm:px-5 xl:px-0 py-10 xl:mt-0">
+                    <div className="rounded-[40px] bg-white/20 relative overflow-hidden shadow-[inset_0px_-6px_20.8px_rgba(255,255,255,0.60)] w-full">
                         <div className="flex flex-col md:flex-row w-full gap-3 md:gap-5">
                             {/* Sidebar with thumbnails - Modified for responsive */}
                             <div className="w-full md:w-[25%] rounded-s-[2rem] p-2 md:p-4">
@@ -247,7 +274,7 @@ export default function Home() {
                                                             ${selectedCategory === category
                                                                 ? 'bg-[#213C3A] text-white  border border-[#213C3A]'
                                                                 : 'bg-[#FFF] hover:shadow-[0_0_10px_rgba(255,255,255,0.7)] hover:border hover:border-white'
-                                                            } ${category === 'Teenager' && selectedCategory !== category 
+                                                            } ${category === 'Teenager' && selectedCategory !== category
                                                                 ? 'hover:text-[#213C3A] hover:bg-opacity-90'
                                                                 : ''
                                                             }`}
