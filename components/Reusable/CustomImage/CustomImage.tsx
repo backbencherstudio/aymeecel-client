@@ -7,7 +7,7 @@ interface CustomImageProps {
   width?: number;
   height?: number;
   className?: string;
-  style?: React.CSSProperties;  // Add style prop
+  style?: React.CSSProperties;  
 }
 
 const CustomImage: React.FC<CustomImageProps> = ({
@@ -16,7 +16,7 @@ const CustomImage: React.FC<CustomImageProps> = ({
   width = 500,
   height = 500,
   className,
-  style,  // Add style to props
+  style, 
 }) => {
   return (
     <Image
@@ -25,7 +25,7 @@ const CustomImage: React.FC<CustomImageProps> = ({
       width={width}
       height={height}
       className={className}
-      style={style}  // Pass style to Image component
+      style={style}
     />
   );
 };

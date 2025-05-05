@@ -27,6 +27,34 @@ interface ImageData {
     };
 }
 
+const translations = {
+    en: {
+        welcome: "Welcome!",
+        welcomeText1: `For the 500 th anniversary of the "Prophezy" we at the Faculty of Theology and Religious 
+            Studies and the URPP in Digital Religion(s) at the University of Zurich have explored how 
+            religious objects from 1500-1600 are seen through several different kinds of eyes: those 
+            of humans – a child, a teenager, and religious experts – and the digital 'eyes' of Artificial 
+            Intelligence.`,
+        welcomeText2: `You can click the labelled buttons below and compare these different ways of 'seeing' and 
+            develop your own conclusions about how we gain knowledge about religion in an 
+            increasingly AI filtered world.`,
+        imageCredit: `Images granted by the generosity of the Rettberg Museum and Wikimedia commons, and used under creative 
+            commons license CC BY-SA 2.0`
+    },
+    de: {
+        welcome: "Willkommen!",
+        welcomeText1: `Zum 500. Jubiläum der "Prophezy" haben wir an der Theologischen Fakultät und am URPP 
+            Digital Religion(s) der Universität Zürich untersucht, wie religiöse Objekte aus den Jahren 
+            1500-1600 durch verschiedene Augen gesehen werden: die von Menschen – einem Kind, einem 
+            Teenager und Religionsexperten – und die digitalen 'Augen' der Künstlichen Intelligenz.`,
+        welcomeText2: `Sie können auf die beschrifteten Schaltflächen unten klicken und diese verschiedenen 
+            Arten des 'Sehens' vergleichen und Ihre eigenen Schlüsse darüber ziehen, wie wir in einer 
+            zunehmend KI-gefilterten Welt Wissen über Religion gewinnen.`,
+        imageCredit: `Bilder mit freundlicher Genehmigung des Rettberg Museums und Wikimedia Commons, verwendet unter 
+            der Creative Commons Lizenz CC BY-SA 2.0`
+    }
+};
+
 export default function Home() {
     const [data, setData] = useState<ImageData[]>([]);
     const [selectedImage, setSelectedImage] = useState(0);
@@ -108,22 +136,17 @@ export default function Home() {
                 {/* welcome card  */}
                 <div className="max-w-5xl mx-auto px-2 sm:px-5 xl:px-0 py-8">
                     <div className="rounded-[40px] bg-white/20 p-4 sm:p-8 lg:p-[64px] relative overflow-hidden shadow-[inset_0px_-6px_20.8px_rgba(255,255,255,0.60)] w-full">
-                        <h1 className="text-[32px] lg:text-[56px] font-[700] mb-4">Welcome!</h1>
+                        <h1 className="text-[32px] lg:text-[56px] font-[700] mb-4">
+                            {translations[selectedLang as keyof typeof translations].welcome}
+                        </h1>
                         <p className="mb-4 text-[16px] md:text-[18px] font-[400] leading-[27px]">
-                            For the 500 th anniversary of the &ldquo;Prophezy&rdquo; we at the Faculty of Theology and Religious
-                            Studies and the URPP in Digital Religion(s) at the University of Zurich have explored how
-                            religious objects from 1500-1600 are seen through several different kinds of eyes: those
-                            of humans &ndash; a child, a teenager, and religious experts &ndash; and the digital &lsquo;eyes&rsquo; of Artificial
-                            Intelligence.
+                            {translations[selectedLang as keyof typeof translations].welcomeText1}
                         </p>
                         <p className="mb-4 text-[16px] md:text-[18px] font-[400] leading-[27px]">
-                            You can click the labelled buttons below and compare these different ways of &lsquo;seeing&rsquo; and
-                            develop your own conclusions about how we gain knowledge about religion in an
-                            increasingly AI filtered world.
+                            {translations[selectedLang as keyof typeof translations].welcomeText2}
                         </p>
                         <p className="text-sm font-[400] italic">
-                            Images granted by the generosity of the Rettberg Museum and Wikimedia commons, and used under creative
-                            commons license CC BY-SA 2.0
+                            {translations[selectedLang as keyof typeof translations].imageCredit}
                         </p>
                     </div>
                 </div>
