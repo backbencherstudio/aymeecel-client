@@ -107,17 +107,17 @@ export default function Home() {
 
                 {/* welcome card  */}
                 <div className="max-w-5xl mx-auto px-2 sm:px-5 xl:px-0 py-8">
-                    <div className="rounded-[40px] bg-white/20 px-4 py-8 sm:p-8 lg:p-[64px] relative overflow-hidden shadow-[inset_0px_-6px_20.8px_rgba(255,255,255,0.60)] w-full">
+                    <div className="rounded-[40px] bg-white/20 p-4 sm:p-8 lg:p-[64px] relative overflow-hidden shadow-[inset_0px_-6px_20.8px_rgba(255,255,255,0.60)] w-full">
                         <h1 className="text-[32px] lg:text-[56px] font-[700] mb-4">Welcome!</h1>
                         <p className="mb-4 text-[16px] md:text-[18px] font-[400] leading-[27px]">
-                            For the 500 th anniversary of the "Prophezy" we at the Faculty of Theology and Religious
+                            For the 500 th anniversary of the &ldquo;Prophezy&rdquo; we at the Faculty of Theology and Religious
                             Studies and the URPP in Digital Religion(s) at the University of Zurich have explored how
                             religious objects from 1500-1600 are seen through several different kinds of eyes: those
-                            of humans – a child, a teenager, and religious experts – and the digital 'eyes' of Artificial
+                            of humans &ndash; a child, a teenager, and religious experts &ndash; and the digital &lsquo;eyes&rsquo; of Artificial
                             Intelligence.
                         </p>
                         <p className="mb-4 text-[16px] md:text-[18px] font-[400] leading-[27px]">
-                            You can click the labelled buttons below and compare these different ways of 'seeing' and
+                            You can click the labelled buttons below and compare these different ways of &lsquo;seeing&rsquo; and
                             develop your own conclusions about how we gain knowledge about religion in an
                             increasingly AI filtered world.
                         </p>
