@@ -42,16 +42,10 @@ const translations = {
             commons license CC BY-SA 2.0`
     },
     de: {
-        welcome: "Willkommen!",
-        welcomeText1: `Zum 500. Jubiläum der "Prophezy" haben wir an der Theologischen Fakultät und am URPP 
-            Digital Religion(s) der Universität Zürich untersucht, wie religiöse Objekte aus den Jahren 
-            1500-1600 durch verschiedene Augen gesehen werden: die von Menschen – einem Kind, einem 
-            Teenager und Religionsexperten – und die digitalen 'Augen' der Künstlichen Intelligenz.`,
-        welcomeText2: `Sie können auf die beschrifteten Schaltflächen unten klicken und diese verschiedenen 
-            Arten des 'Sehens' vergleichen und Ihre eigenen Schlüsse darüber ziehen, wie wir in einer 
-            zunehmend KI-gefilterten Welt Wissen über Religion gewinnen.`,
-        imageCredit: `Bilder mit freundlicher Genehmigung des Rettberg Museums und Wikimedia Commons, verwendet unter 
-            der Creative Commons Lizenz CC BY-SA 2.0`
+        welcome: "Herzlich willkommen!",
+        welcomeText1: `Zum 500-Jahr-Jubiläum der „Prophezey“ haben Wissenschaftler:innen der Theologischen und Religionswissenschaftlichen Fakultät und des UFSP Digital Religion(s) der Universität Zürich untersucht, wie religiöse Objekte aus den Jahren 1500–1600 durch unterschiedliche Augen gesehen werden: durch die von Menschen – einem Kind, einem Teenager und religiösen Experten – und durch die digitalen „Augen“ von Künstlicher Intelligenz.`,
+        welcomeText2: `Klicken Sie unten auf die beschrifteten Schaltflächen, um diese unterschiedlichen Arten des „Sehens“ zu vergleichen und Ihre eigenen Schlussfolgerungen darüber ziehen, wie wir in einer zunehmend von KI gefilterten Welt Wissen über Religion erlangen.`,
+        imageCredit: `Bilder wurden dankenswerterweise vom Rietberg Museum und Wikimedia Commons zur Verfügung gestellt und werden unter der Creative Commons-Lizenz CC BY-SA 3.0 verwendet.`
     }
 };
 
