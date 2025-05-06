@@ -49,6 +49,21 @@ const translations = {
     }
 };
 
+const categoryTranslations = {
+    en: {
+        "AI": "AI",
+        "Child": "Child",
+        "Teenager": "Teenager",
+        "Adult Expert": "Adult Expert"
+    },
+    de: {
+        "AI": "KI",
+        "Child": "Kind",
+        "Teenager": "Jugendlicher",
+        "Adult Expert": "Erwachsener Experte"
+    }
+};
+
 export default function Home() {
     const [data, setData] = useState<ImageData[]>([]);
     const [selectedImage, setSelectedImage] = useState(0);
@@ -297,7 +312,7 @@ export default function Home() {
                                                             }`}
                                                     >
                                                         <span className={`${selectedCategory === category ? 'text-shadow-neon' : ''}`}>
-                                                            {category}
+                                                            {categoryTranslations[selectedLang as keyof typeof categoryTranslations][category]}
                                                         </span>
                                                     </button>
                                                 ))
