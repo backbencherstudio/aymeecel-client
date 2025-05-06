@@ -1,8 +1,8 @@
 import React from 'react';
-import logo from '@/public/logo/log.png'
 import sublogo from '@/public/logo/sublogo.png'
 import Link from 'next/link';
 import CustomImage from '../Reusable/CustomImage/CustomImage';
+import FooterIcon from '@/public/icon/footerIcon';
 
 export default function Footer() {
     return (
@@ -11,7 +11,7 @@ export default function Footer() {
                 {/* Logo section */}
                 <div className="flex gap-10 md:gap-5 items-start md:items-center mb-8">
                     <div className="w-[176px] h-[60px]">
-                        <CustomImage src={logo.src} width={200} height={100} alt="University of Zurich logo" className="w-full h-full" />
+                        <FooterIcon />
 
                     </div>
                     <div className="w-[65px] h-[65px]">
