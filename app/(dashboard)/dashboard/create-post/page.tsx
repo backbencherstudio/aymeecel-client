@@ -8,7 +8,7 @@ import { IoCloseCircle } from 'react-icons/io5';
 import CustomImage from '@/components/Reusable/CustomImage/CustomImage';
 import { useFormLanguage } from '@/context/FormLanguageContext';
 import FormLangSwitcher from '@/components/FormLangSwitcher';
-import { Editor } from '@tinymce/tinymce-react';
+import JoditEditor from 'jodit-react';
 
 
 interface PostFormData {
@@ -80,9 +80,8 @@ export default function CreatePost() {
   const router = useRouter();
 
   useEffect(() => {
-    // If we're in edit mode, we should skip the step system
     if (postId) {
-      setStep(2); // Skip to final step for editing
+      setStep(2);
     }
   }, [postId]);
 
@@ -126,7 +125,7 @@ export default function CreatePost() {
   };
 
   const handleEditorChange = React.useCallback(
-    (content: string, editor: unknown, field: DescriptionField) => {
+    (content: string, field: DescriptionField) => {
       setTempData(prev => {
         const newData = { ...prev };
         if (formLang === 'en') {
@@ -296,6 +295,80 @@ export default function CreatePost() {
     }
   };
 
+  // Create a config object for Jodit
+  const editorConfig = {
+    readonly: false,
+    height: 300,
+    toolbar: true,
+    spellcheck: false,
+    language: "en",
+    toolbarButtonSize: "middle" as const,
+    toolbarAdaptive: false,
+    showCharsCounter: false,
+    showWordsCounter: false,
+    showXPathInStatusbar: false,
+    askBeforePasteHTML: false,
+    askBeforePasteFromWord: false,
+    defaultActionOnPaste: "insert_clear_html",
+    buttons: [
+      'source', '|',
+      'bold', 'italic', 'underline', 'strikethrough', '|',
+      'superscript', 'subscript', '|',
+      'ul', 'ol', 'indent', 'outdent', '|',
+      'font', 'fontsize', 'brush', 'paragraph', '|',
+      'align', '|',
+      'table', 'link', '|',
+      'undo', 'redo', '|',
+      'eraser', 'fullsize'
+    ],
+    removeButtons: ['about'],
+    uploader: {
+      insertImageAsBase64URI: true
+    },
+    enter: 'P',
+    enterBlock: 'P',
+    list: {
+      indent: 20,
+      defaultStyle: 'circle',
+    },
+    controls: {
+      ul: {
+        list: {
+          'default': 'Default',
+          'circle': 'Circle',
+          'disc': 'Disc',
+          'square': 'Square',
+        }
+      },
+      ol: {
+        list: {
+          'default': 'Default',
+          '1': 'Numbered',
+          'i': 'Roman',
+          'a': 'Alphabetical',
+        }
+      },
+      fontsize: {
+        list: [
+          '8',
+          '10',
+          '12',
+          '14',
+          '16',
+          '18',
+          '24',
+          '36'
+        ]
+      }
+    },
+    cleanHTML: {
+      fillEmptyParagraph: false,
+      removeEmptyElements: false,
+      removeSpans: false,
+      replaceNBSP: false
+    }
+  } as const;
+
   return (
     <div className="container mx-auto p-6">
       <div className='flex flex-col md:flex-row  gap-5 mb-10 md:mb-0 justify-between items-center'>
@@ -371,74 +444,34 @@ export default function CreatePost() {
               <h2 className="text-lg font-semibold">English Descriptions</h2>
               <div>
                 <label className="block text-sm font-medium text-gray-700">AI Description</label>
-                <Editor
-                  apiKey={process.env.NEXT_PUBLIC_API_KEY}
-                  init={{
-                    height: 300,
-                    menubar: false,
-                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'],
-                    toolbar: 'undo redo | blocks | bold italic | ' +
-                      'alignleft aligncenter alignright alignjustify | ' +
-                      'bullist numlist outdent indent | removeformat | help'
-                  }}
+                <JoditEditor
+                  config={editorConfig as any}
                   value={tempData.descriptions_en.AI}
-                  onEditorChange={(content, editor) => handleEditorChange(content, editor, 'AI')}
+                  onBlur={(content) => handleEditorChange(content, 'AI')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Child Description</label>
-                <Editor
-                  apiKey={process.env.NEXT_PUBLIC_API_KEY}
-                  init={{
-                    height: 300,
-                    menubar: false,
-                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'],
-                    toolbar: 'undo redo | blocks | bold italic | ' +
-                      'alignleft aligncenter alignright alignjustify | ' +
-                      'bullist numlist outdent indent | removeformat | help'
-                  }}
+                <JoditEditor
+                  config={editorConfig as any}
                   value={tempData.descriptions_en.Child}
-                  onEditorChange={(content, editor) => handleEditorChange(content, editor, 'Child')}
+                  onBlur={(content) => handleEditorChange(content, 'Child')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Teenager Description</label>
-                <Editor
-                  apiKey={process.env.NEXT_PUBLIC_API_KEY}
-                  init={{
-                    height: 300,
-                    menubar: false,
-                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'],
-                    toolbar: 'undo redo | blocks | bold italic | ' +
-                      'alignleft aligncenter alignright alignjustify | ' +
-                      'bullist numlist outdent indent | removeformat | help'
-                  }}
+                <JoditEditor
+                  config={editorConfig as any}
                   value={tempData.descriptions_en.Teenager}
-                  onEditorChange={(content, editor) => handleEditorChange(content, editor, 'Teenager')}
+                  onBlur={(content) => handleEditorChange(content, 'Teenager')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Adult Expert Description</label>
-                <Editor
-                  apiKey={process.env.NEXT_PUBLIC_API_KEY}
-                  init={{
-                    height: 300,
-                    menubar: false,
-                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'],
-                    toolbar: 'undo redo | blocks | bold italic | ' +
-                      'alignleft aligncenter alignright alignjustify | ' +
-                      'bullist numlist outdent indent | removeformat | help'
-                  }}
+                <JoditEditor
+                  config={editorConfig as any}
                   value={tempData.descriptions_en["Adult Expert"]}
-                  onEditorChange={(content, editor) => handleEditorChange(content, editor, "Adult Expert")}
+                  onBlur={(content) => handleEditorChange(content, "Adult Expert")}
                 />
               </div>
             </div>
@@ -447,74 +480,34 @@ export default function CreatePost() {
               <h2 className="text-lg font-semibold">Deutsche Beschreibungen</h2>
               <div>
                 <label className="block text-sm font-medium text-gray-700">KI-Beschreibung</label>
-                <Editor
-                  apiKey={process.env.NEXT_PUBLIC_API_KEY}
-                  init={{
-                    height: 300,
-                    menubar: false,
-                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'],
-                    toolbar: 'undo redo | blocks | bold italic | ' +
-                      'alignleft aligncenter alignright alignjustify | ' +
-                      'bullist numlist outdent indent | removeformat | help'
-                  }}
+                <JoditEditor
+                  config={editorConfig as any}
                   value={tempData.descriptions_de.AI}
-                  onEditorChange={(content, editor) => handleEditorChange(content, editor, 'AI')}
+                  onBlur={(content) => handleEditorChange(content, 'AI')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Kinder-Beschreibung</label>
-                <Editor
-                  apiKey={process.env.NEXT_PUBLIC_API_KEY}
-                  init={{
-                    height: 300,
-                    menubar: false,
-                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'],
-                    toolbar: 'undo redo | blocks | bold italic | ' +
-                      'alignleft aligncenter alignright alignjustify | ' +
-                      'bullist numlist outdent indent | removeformat | help'
-                  }}
+                <JoditEditor
+                  config={editorConfig as any}
                   value={tempData.descriptions_de.Child}
-                  onEditorChange={(content, editor) => handleEditorChange(content, editor, 'Child')}
+                  onBlur={(content) => handleEditorChange(content, 'Child')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Jugendlichen-Beschreibung</label>
-                <Editor
-                  apiKey={process.env.NEXT_PUBLIC_API_KEY}
-                  init={{
-                    height: 300,
-                    menubar: false,
-                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'],
-                    toolbar: 'undo redo | blocks | bold italic | ' +
-                      'alignleft aligncenter alignright alignjustify | ' +
-                      'bullist numlist outdent indent | removeformat | help'
-                  }}
+                <JoditEditor
+                  config={editorConfig as any}
                   value={tempData.descriptions_de.Teenager}
-                  onEditorChange={(content, editor) => handleEditorChange(content, editor, 'Teenager')}
+                  onBlur={(content) => handleEditorChange(content, 'Teenager')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Experten-Beschreibung</label>
-                <Editor
-                  apiKey={process.env.NEXT_PUBLIC_API_KEY}
-                  init={{
-                    height: 300,
-                    menubar: false,
-                    plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'],
-                    toolbar: 'undo redo | blocks | bold italic | ' +
-                      'alignleft aligncenter alignright alignjustify | ' +
-                      'bullist numlist outdent indent | removeformat | help'
-                  }}
+                <JoditEditor
+                  config={editorConfig as any}
                   value={tempData.descriptions_de["Adult Expert"]}
-                  onEditorChange={(content, editor) => handleEditorChange(content, editor, "Adult Expert")}
+                  onBlur={(content) => handleEditorChange(content, "Adult Expert")}
                 />
               </div>
             </div>
