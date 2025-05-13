@@ -127,6 +127,17 @@ export default function Home() {
         setTimeout(() => setImageLoading(false), 500);
     };
 
+    const scrollThumbnails = (direction: 'up' | 'down') => {
+        const container = document.querySelector('.image-scroll-container');
+        if (container) {
+            const scrollAmount = direction === 'up' ? -100 : 100;
+            container.scrollBy({
+                top: scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    };
+
     if (loading) {
         return <div className="flex items-center justify-center h-64">
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -187,6 +198,7 @@ export default function Home() {
                                             onClick={() => {
                                                 setImageLoading(true);
                                                 setSelectedImage(prev => Math.max(0, prev - 1));
+                                                scrollThumbnails('up');
                                                 setTimeout(() => setImageLoading(false), 500);
                                             }}
                                         />
@@ -239,6 +251,7 @@ export default function Home() {
                                             onClick={() => {
                                                 setImageLoading(true);
                                                 setSelectedImage(prev => Math.min(data.length - 1, prev + 1));
+                                                scrollThumbnails('down');
                                                 setTimeout(() => setImageLoading(false), 500);
                                             }}
                                         />
