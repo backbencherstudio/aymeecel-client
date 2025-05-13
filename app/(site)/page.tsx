@@ -192,7 +192,7 @@ export default function Home() {
                                     </div>
 
                                     {/* Desktop up arrow */}
-                                    <div className="hidden md:block">
+                                    <div className="hidden md:block select-none">
                                         <IoChevronUpOutline
                                             className="text-gray-400 text-3xl cursor-pointer hover:text-gray-600"
                                             onClick={() => {
@@ -204,7 +204,7 @@ export default function Home() {
                                         />
                                     </div>
 
-                                    <div className="mx-2 h-[120px] flex justify-center items-center md:my-5 flex-1 md:w-full">
+                                    <div className="mx-2 h-[120px] flex justify-center items-center md:my-5 flex-1 md:w-full select-none">
                                         <div className="flex items-center md:block space-x-2 md:space-x-0 md:space-y-3 lg:max-h-[570px] overflow-x-auto md:overflow-y-auto image-scroll-container py-1">
                                             {data?.map((item, index) => (
                                                 <div
@@ -245,7 +245,7 @@ export default function Home() {
                                     </div>
 
                                     {/* Desktop down arrow */}
-                                    <div className="hidden md:block">
+                                    <div className="hidden md:block select-none">
                                         <IoChevronDownOutline
                                             className="text-gray-400 text-3xl cursor-pointer hover:text-gray-600"
                                             onClick={() => {
@@ -258,7 +258,7 @@ export default function Home() {
                                     </div>
                                 </div>
                                 {/* Mobile Dots Navigation */}
-                                <div className="flex mt-5 md:hidden justify-center items-center gap-2">
+                                <div className="flex mt-5 md:hidden justify-center items-center gap-2 select-none">
                                     {data?.map((_, index) => (
                                         <button
                                             key={index}
