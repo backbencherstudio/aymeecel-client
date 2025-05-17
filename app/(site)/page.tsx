@@ -408,7 +408,10 @@ export default function Home() {
                                             )}
                                         </div>
 
-                                        <div className={`bg-white rounded-[12.216px] p-4 flex-1 overflow-y-scroll custom-scrollbar max-h-[230px] ${imageLoading ? 'animate-pulse' : ''}`}>
+
+                                      
+
+                                        <div className={`bg-white rounded-[12.216px] p-4 flex-1  scrollable-container max-h-[230px] ${imageLoading ? 'animate-pulse' : ''}`}>
                                             {imageLoading ? (
                                                 <div className="space-y-2">
                                                     <div className="h-4 bg-gray-200 rounded w-3/4"></div>
@@ -421,6 +424,7 @@ export default function Home() {
                                                 </div>
                                             )}
                                         </div>
+                                      
                                     </div>
                                 )}
                             </div>
