@@ -220,7 +220,8 @@ body {
 
 
 .scrollable-container::-webkit-scrollbar {
-  width: 4px; 
+  width: 5px; 
+  border-radius: 10px;
 }
 
 .scrollable-container::-webkit-scrollbar-thumb {
