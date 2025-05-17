@@ -10,14 +10,14 @@ export default function Footer() {
             <div className="container px-2 sm:px-5 xl:px-0">
                 {/* Logo section */}
                 <div className="flex gap-10 md:gap-5 items-start md:items-center mb-8">
-                    <div className="w-[176px] h-[60px]">
+                    <Link href="https://www.theologie.uzh.ch/en.html#:~:text=The%20Faculty%20of%20Theology%20and,qualified%20research%20and%20teaching%20staff." target="_blank" className="w-[176px] h-[60px]">
                         <FooterIcon />
 
-                    </div>
-                    <div className="w-[65px] h-[65px]">
+                    </Link>
+                    <Link href="https://www.digitalreligions.uzh.ch/en.html" target="_blank" className="w-[65px] h-[65px]">
                         <CustomImage src={sublogo.src} width={200} height={100} alt="University of Zurich logo" className="w-full h-full" />
 
-                    </div>
+                    </Link>
                 </div>
 
                 {/* Divider line */}

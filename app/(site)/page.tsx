@@ -30,22 +30,53 @@ interface ImageData {
 const translations = {
     en: {
         welcome: "Welcome!",
-        welcomeText1: `For the 500 th anniversary of the "Prophezy" we at the Faculty of Theology and Religious 
-            Studies and the URPP in Digital Religion(s) at the University of Zurich have explored how 
-            religious objects from 1500-1600 are seen through several different kinds of eyes: those 
-            of humans – a child, a teenager, and religious experts – and the digital 'eyes' of Artificial 
-            Intelligence.`,
+        welcomeText1: {
+            prefix: "For the ",
+            link: `500th anniversary of the "Prophezy"`,
+            link_url: "https://www.1525.uzh.ch/de.html",
+            prefix2: " we at the ",
+            link2: "Faculty of Theology and Religious Studies",
+            link2_url: "https://www.theologie.uzh.ch/en.html",
+            prefix3: " and the ",
+            link3: "URPP in Digital Religion(s)",
+            link3_url: "https://www.digitalreligions.uzh.ch/en.html",
+            prefix4: " at the ",
+            link4: "University of Zurich",
+            link4_url: "https://www.uzh.ch/en.html",
+            suffix: ` have explored how religious objects from 1500-1600 are seen through several different kinds of eyes: those 
+                of humans – a child, a teenager, and religious experts – and the digital 'eyes' of Artificial 
+                Intelligence.`
+        },
         welcomeText2: `You can click the labelled buttons below and compare these different ways of 'seeing' and 
             develop your own conclusions about how we gain knowledge about religion in an 
             increasingly AI filtered world.`,
-        imageCredit: `Images granted by the generosity of the Rettberg Museum and Wikimedia commons, and used under creative 
-            commons license CC BY-SA 2.0`
+        imageCredit: `Images granted by the generosity of the `,
+        link5: "Rietberg Museum",
+        link5_url: "https://rietberg.ch/",
+        prefix5: " and Wikimedia commons, and used under creative commons license CC BY-SA 3.0"
     },
     de: {
         welcome: "Herzlich willkommen!",
-        welcomeText1: `Zum 500-Jahr-Jubiläum der „Prophezey“ haben Wissenschaftler:innen der Theologischen und Religionswissenschaftlichen Fakultät und des UFSP Digital Religion(s) der Universität Zürich untersucht, wie religiöse Objekte aus den Jahren 1500–1600 durch unterschiedliche Augen gesehen werden: durch die von Menschen – einem Kind, einem Teenager und religiösen Experten – und durch die digitalen „Augen“ von Künstlicher Intelligenz.`,
-        welcomeText2: `Klicken Sie unten auf die beschrifteten Schaltflächen, um diese unterschiedlichen Arten des „Sehens“ zu vergleichen und Ihre eigenen Schlussfolgerungen darüber ziehen, wie wir in einer zunehmend von KI gefilterten Welt Wissen über Religion erlangen.`,
-        imageCredit: `Bilder wurden dankenswerterweise vom Rietberg Museum und Wikimedia Commons zur Verfügung gestellt und werden unter der Creative Commons-Lizenz CC BY-SA 3.0 verwendet.`
+        welcomeText1: {
+            prefix: "Zum ",
+            link: `500-Jahr-Jubiläum der "Prophezey"`,
+            link_url: "https://www.1525.uzh.ch/de.html",
+            prefix2: " haben Wissenschaftler:innen der ",
+            link2: "Theologischen und Religionswissenschaftlichen Fakultät",
+            link2_url: "https://www.theologie.uzh.ch/en.html",
+            prefix3: " und des ",
+            link3: "UFSP Digital Religion(s)",
+            link3_url: "https://www.digitalreligions.uzh.ch/en.html",
+            prefix4: " der ",
+            link4: "Universität Zürich",
+            link4_url: "https://www.uzh.ch/en.html",
+            suffix: ` untersucht, wie religiöse Objekte aus den Jahren 1500–1600 durch unterschiedliche Augen gesehen werden: durch die von Menschen – einem Kind, einem Teenager und religiösen Experten – und durch die digitalen "Augen" von Künstlicher Intelligenz.`
+        },
+        welcomeText2: `Klicken Sie unten auf die beschrifteten Schaltflächen, um diese unterschiedlichen Arten des "Sehens" zu vergleichen und Ihre eigenen Schlussfolgerungen darüber ziehen, wie wir in einer zunehmend von KI gefilterten Welt Wissen über Religion erlangen.`,
+        imageCredit: `Bilder wurden dankenswerterweise vom `,
+        link5: "Rietberg Museum",
+        link5_url: "https://rietberg.ch/",
+        prefix5: " und Wikimedia Commons zur Verfügung gestellt und werden unter der Creative Commons-Lizenz CC BY-SA 3.0 verwendet."
     }
 };
 
@@ -67,7 +98,7 @@ const categoryTranslations = {
 export default function Home() {
     const [data, setData] = useState<ImageData[]>([]);
     const [selectedImage, setSelectedImage] = useState(0);
-    const [selectedCategory, setSelectedCategory] = useState<keyof ImageData['descriptions']>("Teenager");
+    const [selectedCategory, setSelectedCategory] = useState<keyof ImageData['descriptions']>("AI");
     const [loading, setLoading] = useState(true);
     const [imageLoading, setImageLoading] = useState(false);
     const { selectedLang } = useLanguage();
@@ -156,17 +187,62 @@ export default function Home() {
                 {/* welcome card  */}
                 <div className="max-w-5xl mx-auto px-2 sm:px-5 xl:px-0 py-8">
                     <div className="rounded-[40px] bg-white/20 p-4 sm:p-8 lg:p-[64px] relative overflow-hidden shadow-[inset_0px_-6px_20.8px_rgba(255,255,255,0.60)] w-full">
-                        <h1 className="text-[32px] lg:text-[56px] font-[700] mb-4">
+                        <h1 className="text-[32px] lg:text-[56px] font-[700] mb-4" >
                             {translations[selectedLang as keyof typeof translations].welcome}
                         </h1>
                         <p className="mb-4 text-[16px] md:text-[18px] font-[400] leading-[27px]">
-                            {translations[selectedLang as keyof typeof translations].welcomeText1}
+                            {translations[selectedLang as keyof typeof translations].welcomeText1.prefix}
+                            <a
+                                href={translations[selectedLang as keyof typeof translations].welcomeText1.link_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline"
+                            >
+                                {translations[selectedLang as keyof typeof translations].welcomeText1.link}
+                            </a>
+                            {translations[selectedLang as keyof typeof translations].welcomeText1.prefix2}
+                            <a
+                                href={translations[selectedLang as keyof typeof translations].welcomeText1.link2_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline"
+                            >
+                                {translations[selectedLang as keyof typeof translations].welcomeText1.link2}
+                            </a>
+                            {translations[selectedLang as keyof typeof translations].welcomeText1.prefix3}
+                            <a
+                                href={translations[selectedLang as keyof typeof translations].welcomeText1.link3_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline"
+                            >
+                                {translations[selectedLang as keyof typeof translations].welcomeText1.link3}
+                            </a>
+                            {translations[selectedLang as keyof typeof translations].welcomeText1.prefix4}
+                            <a
+                                href={translations[selectedLang as keyof typeof translations].welcomeText1.link4_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline"
+                            >
+                                {translations[selectedLang as keyof typeof translations].welcomeText1.link4}
+                            </a>
+                            {translations[selectedLang as keyof typeof translations].welcomeText1.suffix}
                         </p>
                         <p className="mb-4 text-[16px] md:text-[18px] font-[400] leading-[27px]">
                             {translations[selectedLang as keyof typeof translations].welcomeText2}
                         </p>
                         <p className="text-sm font-[400] italic">
                             {translations[selectedLang as keyof typeof translations].imageCredit}
+                            <a
+                                href={translations[selectedLang as keyof typeof translations].link5_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline"
+                            >
+                                {translations[selectedLang as keyof typeof translations].link5}
+                            </a>
+                            {translations[selectedLang as keyof typeof translations].prefix5}
                         </p>
                     </div>
                 </div>
@@ -332,7 +408,7 @@ export default function Home() {
                                             )}
                                         </div>
 
-                                        <div className={`bg-white rounded-[12.216px] p-4 flex-1 overflow-y-auto max-h-[230px] ${imageLoading ? 'animate-pulse' : ''}`}>
+                                        <div className={`bg-white rounded-[12.216px] p-4 flex-1 overflow-y-scroll custom-scrollbar max-h-[230px] ${imageLoading ? 'animate-pulse' : ''}`}>
                                             {imageLoading ? (
                                                 <div className="space-y-2">
                                                     <div className="h-4 bg-gray-200 rounded w-3/4"></div>
