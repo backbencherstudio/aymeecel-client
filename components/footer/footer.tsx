@@ -1,5 +1,5 @@
 import React from 'react';
-import sublogo from '@/public/logo/sublogo.png'
+import sublogo from '@/public/logo/icon.svg'
 import Link from 'next/link';
 import CustomImage from '../Reusable/CustomImage/CustomImage';
 import FooterIcon from '@/public/icon/footerIcon';
@@ -14,8 +14,8 @@ export default function Footer() {
                         <FooterIcon />
 
                     </Link>
-                    <Link href="https://www.digitalreligions.uzh.ch/en.html" target="_blank" className="w-[65px] h-[65px]">
-                        <CustomImage src={sublogo.src} width={200} height={100} alt="University of Zurich logo" className="w-full h-full" />
+                    <Link href="https://www.digitalreligions.uzh.ch/en.html" target="_blank" className="w-[60px] h-[60px]">
+                        <CustomImage src={sublogo.src} width={200} height={200} alt="University of Zurich logo" className="w-full h-full" />
 
                     </Link>
                 </div>
