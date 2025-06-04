@@ -14,7 +14,7 @@ export default function Footer() {
                         <FooterIcon />
 
                     </Link>
-                    <Link href="https://www.digitalreligions.uzh.ch/en.html" target="_blank" className="w-[60px] h-[60px]">
+                    <Link href="https://www.digitalreligions.uzh.ch/en.html" target="_blank" className="w-[64px] h-[64px]">
                         <CustomImage src={sublogo.src} width={200} height={200} alt="University of Zurich logo" className="w-full h-full" />
 
                     </Link>
