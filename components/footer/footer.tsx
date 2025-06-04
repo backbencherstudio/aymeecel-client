@@ -1,5 +1,5 @@
 import React from 'react';
-import sublogo from '@/public/logo/icon.svg'
+import sublogo from '@/public/logo/sublogo.png'
 import Link from 'next/link';
 import CustomImage from '../Reusable/CustomImage/CustomImage';
 import FooterIcon from '@/public/icon/footerIcon';
