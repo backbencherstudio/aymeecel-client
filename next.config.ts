@@ -22,7 +22,15 @@ const nextConfig: NextConfig = {
         hostname: '192.168.4.3',
         port: '4000',
         pathname: '/uploads/**',
-      }
+      },
+
+      {
+        protocol: 'https',
+        hostname: 'estate-refrigerator-ancient-careful.trycloudflare.com',
+        pathname: '/uploads/**',
+      },
+
+
 
     ],
   },
