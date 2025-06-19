@@ -126,38 +126,101 @@ export default function AllPost() {
     );
   };
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await getAllPost(currentPage, 5, selectedLang as 'en' | 'de');
-        if (response.success) {
+  // Consolidated fetch function
+  const fetchPosts = useCallback(async (page: number, lang: string, search?: string) => {
+    try {
+      setLoading(true);
+      const response = await getAllPost(page, 5, lang as 'en' | 'de');
+
+      if (response.success) {
+        if (search && search.trim()) {
+          // Filter posts based on search query
+          const filteredPosts = response.posts.filter(post => {
+            const descriptionsField = lang === 'en' ? 'descriptions_en' : 'descriptions_de';
+            let descriptions: Descriptions = {
+              AI: '',
+              Child: '',
+              Teenager: '',
+              "Adult Expert": ''
+            };
+
+            try {
+              const currentDescriptions = post[descriptionsField];
+              
+              if (currentDescriptions) {
+                if (typeof currentDescriptions === 'string') {
+                  descriptions = JSON.parse(currentDescriptions);
+                } else {
+                  descriptions = currentDescriptions as Descriptions;
+                }
+              } else if (descriptionsField === 'descriptions_de' && post.descriptions_en) {
+                const englishDescriptions = post.descriptions_en;
+                if (typeof englishDescriptions === 'string') {
+                  descriptions = JSON.parse(englishDescriptions);
+                } else {
+                  descriptions = englishDescriptions as Descriptions;
+                }
+              }
+
+              const tempDiv = document.createElement('div');
+              const searchLower = search.toLowerCase();
+              const fields: DescriptionField[] = ['AI', 'Child', 'Teenager', 'Adult Expert'];
+
+              return fields.some(field => {
+                if (!descriptions[field]) return false;
+                tempDiv.innerHTML = descriptions[field];
+                const plainText = (tempDiv.textContent || tempDiv.innerText || '').toLowerCase();
+                return plainText.includes(searchLower);
+              });
+            } catch (error) {
+              console.error('Error parsing descriptions during search:', error);
+              return false;
+            }
+          });
+
+          setPosts(filteredPosts);
+          setTotalPages(1);
+          setTotalPosts(filteredPosts.length);
+        } else {
           setPosts(response.posts);
           setTotalPages(response.totalPages);
           setTotalPosts(response.totalPosts);
         }
-      } catch (error) {
-        if (error && typeof error === 'object' && 'response' in error &&
-          error.response && typeof error.response === 'object' &&
-          'status' in error.response && error.response.status === 401) {
-          toast.error('Session expired. Please login again.');
-          setError('Session expired');
-        } else {
-          const errorMessage = error instanceof Error ? error.message : 'Failed to fetch posts';
-          toast.error(errorMessage);
-          setError(errorMessage);
-        }
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+      if (error && typeof error === 'object' && 'response' in error &&
+        error.response && typeof error.response === 'object' &&
+        'status' in error.response && error.response.status === 401) {
+        toast.error('Session expired. Please login again.');
+        setError('Session expired');
+      } else {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch posts';
+        toast.error(errorMessage);
+        setError(errorMessage);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-    fetchPosts();
-  }, [currentPage, selectedLang]);
+  // Single useEffect for data fetching
+  useEffect(() => {
+    fetchPosts(currentPage, selectedLang as 'en' | 'de', searchQuery);
+  }, [currentPage, selectedLang, fetchPosts]);
+
+  // Separate useEffect for URL updates (without triggering data fetch)
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('lang', selectedLang);
+    if (searchQuery) {
+      params.set('search', searchQuery);
+    }
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [selectedLang, pathname, router, searchParams, searchQuery]);
 
   // Add pagination controls
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
-    setLoading(true);
   };
 
   // Add this before the return statement
@@ -228,13 +291,8 @@ export default function AllPost() {
             : currentPage;
           
           // Fetch updated posts
-          const updatedResponse = await getAllPost(newCurrentPage, 5, selectedLang as 'en' | 'de');
-          if (updatedResponse.success) {
-            setPosts(updatedResponse.posts);
-            setTotalPages(updatedResponse.totalPages);
-            setTotalPosts(updatedResponse.totalPosts);
-            setCurrentPage(newCurrentPage);
-          }
+          await fetchPosts(newCurrentPage, selectedLang as 'en' | 'de', searchQuery);
+          setCurrentPage(newCurrentPage);
         }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to delete post';
@@ -326,98 +384,23 @@ export default function AllPost() {
     );
   };
 
-  // Update the debouncedSearch implementation with proper dependencies
-  const debouncedSearch = useCallback(
-    (query: string) => {
-      const search = async () => {
-        try {
-          setLoading(true);
-          const response = await getAllPost(currentPage, 5, selectedLang as 'en' | 'de');
-
-          if (response.success) {
-            if (query.trim()) {
-              const filteredPosts = response.posts.filter(post => {
-                const descriptionsField = selectedLang === 'en' ? 'descriptions_en' : 'descriptions_de';
-                let descriptions: Descriptions = {
-                  AI: '',
-                  Child: '',
-                  Teenager: '',
-                  "Adult Expert": ''
-                };
-
-                try {
-                  const currentDescriptions = post[descriptionsField];
-                  
-                  if (currentDescriptions) {
-                    if (typeof currentDescriptions === 'string') {
-                      descriptions = JSON.parse(currentDescriptions);
-                    } else {
-                      descriptions = currentDescriptions as Descriptions;
-                    }
-                  } else if (descriptionsField === 'descriptions_de' && post.descriptions_en) {
-                    const englishDescriptions = post.descriptions_en;
-                    if (typeof englishDescriptions === 'string') {
-                      descriptions = JSON.parse(englishDescriptions);
-                    } else {
-                      descriptions = englishDescriptions as Descriptions;
-                    }
-                  }
-
-                  const tempDiv = document.createElement('div');
-                  const searchLower = query.toLowerCase();
-                  const fields: DescriptionField[] = ['AI', 'Child', 'Teenager', 'Adult Expert'];
-
-                  return fields.some(field => {
-                    if (!descriptions[field]) return false;
-                    tempDiv.innerHTML = descriptions[field];
-                    const plainText = (tempDiv.textContent || tempDiv.innerText || '').toLowerCase();
-                    return plainText.includes(searchLower);
-                  });
-                } catch (error) {
-                  console.error('Error parsing descriptions during search:', error);
-                  return false;
-                }
-              });
-
-              setPosts(filteredPosts);
-              setTotalPages(1);
-              setTotalPosts(filteredPosts.length);
-            } else {
-              setPosts(response.posts);
-              setTotalPages(response.totalPages);
-              setTotalPosts(response.totalPosts);
-            }
-          }
-        } catch (error) {
-          console.error('Search error:', error);
-          const errorMessage = error instanceof Error ? error.message : 'Failed to search posts';
-          toast.error(errorMessage);
-          setError(errorMessage);
-        } finally {
-          setLoading(false);
-        }
-      };
-      search();
-    },
-    [currentPage, selectedLang] // Add required dependencies
-  );
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Debounced search function
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
-    debouncedSearch(query);
-  };
-
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('lang', selectedLang);
-    if (searchQuery) {
-      params.set('search', searchQuery);
+    
+    // Reset to first page when searching
+    if (currentPage !== 1) {
+      setCurrentPage(1);
     }
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
-    setLoading(true);
+    
+    // Use setTimeout for debouncing
+    const timeoutId = setTimeout(() => {
+      fetchPosts(1, selectedLang as 'en' | 'de', query);
+    }, 300);
 
-  }, [selectedLang, pathname, router, searchParams, searchQuery]); // Add missing dependencies
+    return () => clearTimeout(timeoutId);
+  }, [currentPage, selectedLang, fetchPosts]);
 
   return (
     <div className="max-w-8xl mx-auto">

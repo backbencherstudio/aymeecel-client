@@ -79,11 +79,33 @@ export default function CreatePost() {
   const [isEditMode, setIsEditMode] = useState(false);
   const router = useRouter();
 
+  // Add local state for each editor field
+  const [enAI, setEnAI] = useState("");
+  const [enChild, setEnChild] = useState("");
+  const [enTeenager, setEnTeenager] = useState("");
+  const [enAdultExpert, setEnAdultExpert] = useState("");
+  const [deAI, setDeAI] = useState("");
+  const [deChild, setDeChild] = useState("");
+  const [deTeenager, setDeTeenager] = useState("");
+  const [deAdultExpert, setDeAdultExpert] = useState("");
+
   useEffect(() => {
     if (postId) {
       setStep(2);
     }
   }, [postId]);
+
+  // Sync local state with tempData when language or edit mode changes
+  useEffect(() => {
+    setEnAI(tempData.descriptions_en.AI);
+    setEnChild(tempData.descriptions_en.Child);
+    setEnTeenager(tempData.descriptions_en.Teenager);
+    setEnAdultExpert(tempData.descriptions_en["Adult Expert"]);
+    setDeAI(tempData.descriptions_de.AI);
+    setDeChild(tempData.descriptions_de.Child);
+    setDeTeenager(tempData.descriptions_de.Teenager);
+    setDeAdultExpert(tempData.descriptions_de["Adult Expert"]);
+  }, [formLang, isEditMode, tempData]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -220,7 +242,35 @@ export default function CreatePost() {
     fetchPost();
   }, [postId]);
 
+  // Update tempData and form value on submit
+  const syncEditorStates = () => {
+    setTempData(prev => ({
+      ...prev,
+      descriptions_en: {
+        AI: enAI,
+        Child: enChild,
+        Teenager: enTeenager,
+        "Adult Expert": enAdultExpert
+      },
+      descriptions_de: {
+        AI: deAI,
+        Child: deChild,
+        Teenager: deTeenager,
+        "Adult Expert": deAdultExpert
+      }
+    }));
+    setValue('descriptions_en.AI', enAI);
+    setValue('descriptions_en.Child', enChild);
+    setValue('descriptions_en.Teenager', enTeenager);
+    setValue('descriptions_en.Adult Expert', enAdultExpert);
+    setValue('descriptions_de.AI', deAI);
+    setValue('descriptions_de.Child', deChild);
+    setValue('descriptions_de.Teenager', deTeenager);
+    setValue('descriptions_de.Adult Expert', deAdultExpert);
+  };
+
   const onSubmit = async (data: PostFormData) => {
+    syncEditorStates();
     try {
       if (step === 1 && !isEditMode) {
         // Store the current language data
@@ -446,32 +496,32 @@ export default function CreatePost() {
                 <label className="block text-sm font-medium text-gray-700">AI Description</label>
                 <JoditEditor
                   config={editorConfig as any}
-                  value={tempData.descriptions_en.AI}
-                  onBlur={(content) => handleEditorChange(content, 'AI')}
+                  value={enAI}
+                  onChange={setEnAI}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Child Description</label>
                 <JoditEditor
                   config={editorConfig as any}
-                  value={tempData.descriptions_en.Child}
-                  onBlur={(content) => handleEditorChange(content, 'Child')}
+                  value={enChild}
+                  onChange={setEnChild}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Teenager Description</label>
                 <JoditEditor
                   config={editorConfig as any}
-                  value={tempData.descriptions_en.Teenager}
-                  onBlur={(content) => handleEditorChange(content, 'Teenager')}
+                  value={enTeenager}
+                  onChange={setEnTeenager}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Adult Expert Description</label>
                 <JoditEditor
                   config={editorConfig as any}
-                  value={tempData.descriptions_en["Adult Expert"]}
-                  onBlur={(content) => handleEditorChange(content, "Adult Expert")}
+                  value={enAdultExpert}
+                  onChange={setEnAdultExpert}
                 />
               </div>
             </div>
@@ -482,32 +532,32 @@ export default function CreatePost() {
                 <label className="block text-sm font-medium text-gray-700">KI-Beschreibung</label>
                 <JoditEditor
                   config={editorConfig as any}
-                  value={tempData.descriptions_de.AI}
-                  onBlur={(content) => handleEditorChange(content, 'AI')}
+                  value={deAI}
+                  onChange={setDeAI}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Kinder-Beschreibung</label>
                 <JoditEditor
                   config={editorConfig as any}
-                  value={tempData.descriptions_de.Child}
-                  onBlur={(content) => handleEditorChange(content, 'Child')}
+                  value={deChild}
+                  onChange={setDeChild}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Jugendlichen-Beschreibung</label>
                 <JoditEditor
                   config={editorConfig as any}
-                  value={tempData.descriptions_de.Teenager}
-                  onBlur={(content) => handleEditorChange(content, 'Teenager')}
+                  value={deTeenager}
+                  onChange={setDeTeenager}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Experten-Beschreibung</label>
                 <JoditEditor
                   config={editorConfig as any}
-                  value={tempData.descriptions_de["Adult Expert"]}
-                  onBlur={(content) => handleEditorChange(content, "Adult Expert")}
+                  value={deAdultExpert}
+                  onChange={setDeAdultExpert}
                 />
               </div>
             </div>
