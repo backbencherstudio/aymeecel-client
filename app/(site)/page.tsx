@@ -35,48 +35,44 @@ const translations = {
             link: `500th anniversary of the "Prophezy"`,
             link_url: "https://www.1525.uzh.ch/de.html",
             prefix2: " we at the ",
-            link2: "Faculty of Theology and Religious Studies",
+            link2: "Faculty of Theology and the Study of Religion",
             link2_url: "https://www.theologie.uzh.ch/en.html",
-            prefix3: " and the ",
+            prefix3: " of and the ",
             link3: "URPP in Digital Religion(s)",
             link3_url: "https://www.digitalreligions.uzh.ch/en.html",
             prefix4: " at the ",
             link4: "University of Zurich",
             link4_url: "https://www.uzh.ch/en.html",
-            suffix: ` have explored how religious objects from 1500-1600 are seen through several different kinds of eyes: those 
-                of humans – a child, a teenager, and religious experts – and the digital 'eyes' of Artificial 
-                Intelligence.`
+            suffix: ` have explored how religious objects from 1500-1600 are seen through several different kinds of eyes: those of humans – a child, a teenager, and religious experts –and the digital ‘eyes’ of Artificial Intelligence. You might be surprised that AI actually sees in probabilities, especially if you’ve already experienced chatbots that can describe images – but it chooses those words based on probabilities, which is why some people will say it ‘hallucinates’ its answers rather than really ‘seeing’.`
         },
-        welcomeText2: `You can click the labelled buttons below and compare these different ways of 'seeing' and 
-            develop your own conclusions about how we gain knowledge about religion in an 
-            increasingly AI filtered world.`,
+        welcomeText2: `You can click the labelled buttons below and compare these different ways of ‘seeing’ and develop your own conclusions about how we gain knowledge about religion in an increasingly AI filtered world.`,
         imageCredit: `Images granted by the generosity of the `,
         link5: "Rietberg Museum",
         link5_url: "https://rietberg.ch/",
         prefix5: " and Wikimedia commons, and used under creative commons license CC BY-SA 3.0"
     },
     de: {
-        welcome: "Herzlich willkommen!",
+        welcome: "Willkommen!",
         welcomeText1: {
-            prefix: "Zum ",
-            link: `500-Jahr-Jubiläum der "Prophezey"`,
+            prefix: "Anlässlich des",
+            link: ` 500. Jahrestags der Gründung der «Prophezey»`,
             link_url: "https://www.1525.uzh.ch/de.html",
-            prefix2: " haben Wissenschaftler:innen der ",
-            link2: "Theologischen und Religionswissenschaftlichen Fakultät",
+            prefix2: " haben wir an der ",
+            link2: " Theologischen und Religionswissenschaftlichen Fakultät",
             link2_url: "https://www.theologie.uzh.ch/en.html",
-            prefix3: " und des ",
-            link3: "UFSP Digital Religion(s)",
+            prefix3: " und am",
+            link3: " UFSP «Digital Religion(s)»",
             link3_url: "https://www.digitalreligions.uzh.ch/en.html",
             prefix4: " der ",
-            link4: "Universität Zürich",
+            link4: " Universität Zürichuntersucht ",
             link4_url: "https://www.uzh.ch/en.html",
-            suffix: ` untersucht, wie religiöse Objekte aus den Jahren 1500–1600 durch unterschiedliche Augen gesehen werden: durch die von Menschen – einem Kind, einem Teenager und religiösen Experten – und durch die digitalen "Augen" von Künstlicher Intelligenz.`
+            suffix: ` untersucht, wie religiöse Objekte aus der Zeit von 1500 bis 1600 aus verschiedenen Blickwinkeln betrachtet werden: aus der Perspektive von Menschen – einem fünfjährigen Kind, einem Teenager und religiösen Expert:innen – und aus der digitalen «Perspektive» der künstlichen Intelligenz. Es mag Sie überraschen, dass KI tatsächlich in Wahrscheinlichkeiten ‹sieht›, insbesondere wenn Sie bereits Chatbots kennen, die Bilder beschreiben können. Die KI wählt ihre Worte auf der Grundlage von Wahrscheinlichkeiten aus, weshalb manche Leute sagen, dass sie ihre Antworten eher ‹halluziniert› als wirklich ‹sieht›.`
         },
-        welcomeText2: `Klicken Sie unten auf die beschrifteten Schaltflächen, um diese unterschiedlichen Arten des "Sehens" zu vergleichen und Ihre eigenen Schlussfolgerungen darüber ziehen, wie wir in einer zunehmend von KI gefilterten Welt Wissen über Religion erlangen.`,
-        imageCredit: `Bilder wurden dankenswerterweise vom `,
-        link5: "Rietberg Museum",
+        welcomeText2: `Sie können auf die beschrifteten Schaltflächen unten klicken und diese verschiedenen Arten des «Sehens» vergleichen und Ihre eigenen Schlussfolgerungen darüber ziehen, wie wir in einer zunehmend von KI gefilterten Welt Wissen über Religion erwerben. `,
+        imageCredit: `Bilder mit freundlicher Genehmigung des `,
+        link5: " Rietberg Museums",
         link5_url: "https://rietberg.ch/",
-        prefix5: " und Wikimedia Commons zur Verfügung gestellt und werden unter der Creative Commons-Lizenz CC BY-SA 3.0 verwendet."
+        prefix5: " und Wikimedia Commons, verwendet unter der Creative-Commons-Lizenz CC BY-SA 3.0. "
     }
 };
 

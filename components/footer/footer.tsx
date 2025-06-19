@@ -10,7 +10,7 @@ export default function Footer() {
             <div className="container px-2 sm:px-5 xl:px-0">
                 {/* Logo section */}
                 <div className="flex gap-10 md:gap-5 items-start md:items-center mb-8">
-                    <Link href="https://www.theologie.uzh.ch/en.html#:~:text=The%20Faculty%20of%20Theology%20and,qualified%20research%20and%20teaching%20staff." target="_blank" className="w-[176px] h-[60px]">
+                    <Link href="https://www.trf.uzh.ch" target="_blank" className="w-[176px] h-[60px]">
                         <FooterIcon />
 
                     </Link>
