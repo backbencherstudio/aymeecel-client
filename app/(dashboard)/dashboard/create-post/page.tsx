@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createPost, updatePost, getPostById } from "@/apis/postDataApis";
@@ -146,33 +146,59 @@ export default function CreatePost() {
     e.stopPropagation();
   };
 
-  const handleEditorChange = React.useCallback(
-    (content: string, field: DescriptionField) => {
-      setTempData(prev => {
-        const newData = { ...prev };
-        if (formLang === 'en') {
-          newData.descriptions_en = {
-            ...newData.descriptions_en,
-            [field]: content
-          };
-        } else {
-          newData.descriptions_de = {
-            ...newData.descriptions_de,
-            [field]: content
-          };
-        }
-        return newData;
-      });
-
-      // Update the form value
-      if (formLang === 'en') {
-        setValue(`descriptions_en.${field}`, content, { shouldDirty: true });
-      } else {
-        setValue(`descriptions_de.${field}`, content, { shouldDirty: true });
+  // Handle editor changes with debouncing to prevent excessive re-renders
+  const handleEditorChange = useCallback((content: string, field: DescriptionField, language: 'en' | 'de') => {
+    if (language === 'en') {
+      switch (field) {
+        case 'AI':
+          setEnAI(content);
+          break;
+        case 'Child':
+          setEnChild(content);
+          break;
+        case 'Teenager':
+          setEnTeenager(content);
+          break;
+        case 'Adult Expert':
+          setEnAdultExpert(content);
+          break;
       }
-    },
-    [formLang, setValue]
-  );
+    } else {
+      switch (field) {
+        case 'AI':
+          setDeAI(content);
+          break;
+        case 'Child':
+          setDeChild(content);
+          break;
+        case 'Teenager':
+          setDeTeenager(content);
+          break;
+        case 'Adult Expert':
+          setDeAdultExpert(content);
+          break;
+      }
+    }
+  }, []);
+
+  // Update tempData only when needed (not on every keystroke)
+  // const updateTempData = useCallback(() => {
+  //   setTempData(prev => ({
+  //     ...prev,
+  //     descriptions_en: {
+  //       AI: enAI,
+  //       Child: enChild,
+  //       Teenager: enTeenager,
+  //       "Adult Expert": enAdultExpert
+  //     },
+  //     descriptions_de: {
+  //       AI: deAI,
+  //       Child: deChild,
+  //       Teenager: deTeenager,
+  //       "Adult Expert": deAdultExpert
+  //     }
+  //   }));
+  // }, [enAI, enChild, enTeenager, enAdultExpert, deAI, deChild, deTeenager, deAdultExpert]);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -243,9 +269,8 @@ export default function CreatePost() {
   }, [postId]);
 
   // Update tempData and form value on submit
-  const syncEditorStates = () => {
-    setTempData(prev => ({
-      ...prev,
+  const syncEditorStates = useCallback(() => {
+    const updatedTempData = {
       descriptions_en: {
         AI: enAI,
         Child: enChild,
@@ -258,41 +283,41 @@ export default function CreatePost() {
         Teenager: deTeenager,
         "Adult Expert": deAdultExpert
       }
-    }));
-    setValue('descriptions_en.AI', enAI);
-    setValue('descriptions_en.Child', enChild);
-    setValue('descriptions_en.Teenager', enTeenager);
-    setValue('descriptions_en.Adult Expert', enAdultExpert);
-    setValue('descriptions_de.AI', deAI);
-    setValue('descriptions_de.Child', deChild);
-    setValue('descriptions_de.Teenager', deTeenager);
-    setValue('descriptions_de.Adult Expert', deAdultExpert);
-  };
+    };
+
+    setTempData(updatedTempData);
+    
+    // Update form values
+    setValue('descriptions_en', updatedTempData.descriptions_en);
+    setValue('descriptions_de', updatedTempData.descriptions_de);
+  }, [enAI, enChild, enTeenager, enAdultExpert, deAI, deChild, deTeenager, deAdultExpert, setValue]);
 
   const onSubmit = async (data: PostFormData) => {
+    // Always sync editor states before submission
     syncEditorStates();
+    
     try {
       if (step === 1 && !isEditMode) {
         // Store the current language data
         if (formLang === 'en') {
           setTempData(prev => ({
             ...prev,
-            descriptions_en: data.descriptions_en || {
-              AI: '',
-              Child: '',
-              Teenager: '',
-              "Adult Expert": ''
+            descriptions_en: {
+              AI: enAI,
+              Child: enChild,
+              Teenager: enTeenager,
+              "Adult Expert": enAdultExpert
             }
           }));
           setFormLang('de');
         } else {
           setTempData(prev => ({
             ...prev,
-            descriptions_de: data.descriptions_de || {
-              AI: '',
-              Child: '',
-              Teenager: '',
-              "Adult Expert": ''
+            descriptions_de: {
+              AI: deAI,
+              Child: deChild,
+              Teenager: deTeenager,
+              "Adult Expert": deAdultExpert
             }
           }));
           setFormLang('en');
@@ -310,10 +335,20 @@ export default function CreatePost() {
         return;
       }
 
-      // Combine data from both languages
+      // Use the latest tempData which contains all editor content
       const finalData = {
-        descriptions_en: tempData.descriptions_en,
-        descriptions_de: tempData.descriptions_de
+        descriptions_en: {
+          AI: enAI,
+          Child: enChild,
+          Teenager: enTeenager,
+          "Adult Expert": enAdultExpert
+        },
+        descriptions_de: {
+          AI: deAI,
+          Child: deChild,
+          Teenager: deTeenager,
+          "Adult Expert": deAdultExpert
+        }
       };
 
       if (isEditMode && postId) {
@@ -345,8 +380,8 @@ export default function CreatePost() {
     }
   };
 
-  // Create a config object for Jodit
-  const editorConfig = {
+  // Create a memoized config object for Jodit to prevent re-renders
+  const editorConfig = useMemo(() => ({
     readonly: false,
     height: 300,
     toolbar: true,
@@ -359,7 +394,7 @@ export default function CreatePost() {
     showXPathInStatusbar: false,
     askBeforePasteHTML: false,
     askBeforePasteFromWord: false,
-    defaultActionOnPaste: "insert_clear_html",
+    defaultActionOnPaste: "insert_clear_html" as const,
     buttons: [
       'source', '|',
       'bold', 'italic', 'underline', 'strikethrough', '|',
@@ -375,8 +410,8 @@ export default function CreatePost() {
     uploader: {
       insertImageAsBase64URI: true
     },
-    enter: 'P',
-    enterBlock: 'P',
+    enter: 'p' as const,
+    enterBlock: 'p' as const,
     list: {
       indent: 20,
       defaultStyle: 'circle',
@@ -417,7 +452,84 @@ export default function CreatePost() {
       removeSpans: false,
       replaceNBSP: false
     }
-  } as const;
+  }), []);
+
+  // Memoized editor components to prevent unnecessary re-renders
+  const renderEnglishEditors = useMemo(() => (
+    <div className="space-y-4">
+      <h2 className="text-lg font-semibold">English Descriptions</h2>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">AI Description</label>
+        <JoditEditor
+          config={editorConfig}
+          value={enAI}
+          onChange={(content) => handleEditorChange(content, 'AI', 'en')}
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Child Description</label>
+        <JoditEditor
+          config={editorConfig}
+          value={enChild}
+          onChange={(content) => handleEditorChange(content, 'Child', 'en')}
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Teenager Description</label>
+        <JoditEditor
+          config={editorConfig}
+          value={enTeenager}
+          onChange={(content) => handleEditorChange(content, 'Teenager', 'en')}
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Adult Expert Description</label>
+        <JoditEditor
+          config={editorConfig}
+          value={enAdultExpert}
+          onChange={(content) => handleEditorChange(content, 'Adult Expert', 'en')}
+        />
+      </div>
+    </div>
+  ), [editorConfig, enAI, enChild, enTeenager, enAdultExpert, handleEditorChange]);
+
+  const renderGermanEditors = useMemo(() => (
+    <div className="space-y-4">
+      <h2 className="text-lg font-semibold">Deutsche Beschreibungen</h2>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">KI-Beschreibung</label>
+        <JoditEditor
+          config={editorConfig}
+          value={deAI}
+          onChange={(content) => handleEditorChange(content, 'AI', 'de')}
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Kinder-Beschreibung</label>
+        <JoditEditor
+          config={editorConfig}
+          value={deChild}
+          onChange={(content) => handleEditorChange(content, 'Child', 'de')}
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Jugendlichen-Beschreibung</label>
+        <JoditEditor
+          config={editorConfig}
+          value={deTeenager}
+          onChange={(content) => handleEditorChange(content, 'Teenager', 'de')}
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Experten-Beschreibung</label>
+        <JoditEditor
+          config={editorConfig}
+          value={deAdultExpert}
+          onChange={(content) => handleEditorChange(content, 'Adult Expert', 'de')}
+        />
+      </div>
+    </div>
+  ), [editorConfig, deAI, deChild, deTeenager, deAdultExpert, handleEditorChange]);
 
   return (
     <div className="container mx-auto p-6">
@@ -489,79 +601,7 @@ export default function CreatePost() {
 
         {/* Description Fields */}
         <div className="space-y-4">
-          {formLang === 'en' ? (
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold">English Descriptions</h2>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">AI Description</label>
-                <JoditEditor
-                  config={editorConfig as any}
-                  value={enAI}
-                  onChange={setEnAI}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Child Description</label>
-                <JoditEditor
-                  config={editorConfig as any}
-                  value={enChild}
-                  onChange={setEnChild}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Teenager Description</label>
-                <JoditEditor
-                  config={editorConfig as any}
-                  value={enTeenager}
-                  onChange={setEnTeenager}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Adult Expert Description</label>
-                <JoditEditor
-                  config={editorConfig as any}
-                  value={enAdultExpert}
-                  onChange={setEnAdultExpert}
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold">Deutsche Beschreibungen</h2>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">KI-Beschreibung</label>
-                <JoditEditor
-                  config={editorConfig as any}
-                  value={deAI}
-                  onChange={setDeAI}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Kinder-Beschreibung</label>
-                <JoditEditor
-                  config={editorConfig as any}
-                  value={deChild}
-                  onChange={setDeChild}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Jugendlichen-Beschreibung</label>
-                <JoditEditor
-                  config={editorConfig as any}
-                  value={deTeenager}
-                  onChange={setDeTeenager}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Experten-Beschreibung</label>
-                <JoditEditor
-                  config={editorConfig as any}
-                  value={deAdultExpert}
-                  onChange={setDeAdultExpert}
-                />
-              </div>
-            </div>
-          )}
+          {formLang === 'en' ? renderEnglishEditors : renderGermanEditors}
         </div>
 
         {/* Submit Button */}

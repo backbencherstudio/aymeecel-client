@@ -130,7 +130,10 @@ export default function AllPost() {
   const fetchPosts = useCallback(async (page: number, lang: string, search?: string) => {
     try {
       setLoading(true);
+      console.log('Fetching posts with:', { page, lang, search });
+      
       const response = await getAllPost(page, 5, lang as 'en' | 'de');
+      console.log('API Response:', response);
 
       if (response.success) {
         if (search && search.trim()) {
@@ -178,16 +181,22 @@ export default function AllPost() {
             }
           });
 
+          console.log('Filtered posts:', filteredPosts);
           setPosts(filteredPosts);
           setTotalPages(1);
           setTotalPosts(filteredPosts.length);
         } else {
+          console.log('Setting posts:', response.posts);
           setPosts(response.posts);
           setTotalPages(response.totalPages);
           setTotalPosts(response.totalPosts);
         }
+      } else {
+        console.error('API returned success: false', response);
+        setError('Failed to fetch posts');
       }
     } catch (error) {
+      console.error('Fetch posts error:', error);
       if (error && typeof error === 'object' && 'response' in error &&
         error.response && typeof error.response === 'object' &&
         'status' in error.response && error.response.status === 401) {
@@ -458,6 +467,7 @@ export default function AllPost() {
             </TableHeader>
             <TableBody>
               {posts.map((post, index) => {
+                console.log('Processing post:', post);
                 const descriptionsField = selectedLang === 'en' ? 'descriptions_en' : 'descriptions_de';
                 let descriptions: Descriptions = {
                   AI: '',
@@ -468,12 +478,14 @@ export default function AllPost() {
                 
                 try {
                   const currentDescriptions = post[descriptionsField];
+                  console.log('Current descriptions for', descriptionsField, ':', currentDescriptions);
                   
                   // Check if descriptions exist and handle parsing
                   if (currentDescriptions) {
                     if (typeof currentDescriptions === 'string') {
                       try {
                         descriptions = JSON.parse(currentDescriptions);
+                        console.log('Parsed descriptions:', descriptions);
                       } catch (parseError) {
                         console.error('Error parsing JSON:', parseError);
                         descriptions = {
@@ -485,10 +497,12 @@ export default function AllPost() {
                       }
                     } else {
                       descriptions = currentDescriptions as Descriptions;
+                      console.log('Using object descriptions:', descriptions);
                     }
                   } else if (descriptionsField === 'descriptions_de' && post.descriptions_en) {
                     // Fallback to English if German is not available
                     const englishDescriptions = post.descriptions_en;
+                    console.log('Using English fallback:', englishDescriptions);
                     if (typeof englishDescriptions === 'string') {
                       try {
                         descriptions = JSON.parse(englishDescriptions);
@@ -504,6 +518,8 @@ export default function AllPost() {
                     } else {
                       descriptions = englishDescriptions as Descriptions;
                     }
+                  } else {
+                    console.log('No descriptions found for post:', post.id);
                   }
 
                   // Validate that all required fields exist
