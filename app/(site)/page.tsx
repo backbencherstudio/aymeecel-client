@@ -81,13 +81,13 @@ const categoryTranslations = {
         "AI": "AI",
         "Child": "Child",
         "Teenager": "Teenager",
-        "Adult Expert": "Adult Expert"
+        "Adult Expert": "Expert"
     },
     de: {
         "AI": "KI",
         "Child": "Kind",
         "Teenager": "Jugendlicher",
-        "Adult Expert": "Erwachsener Experte"
+        "Adult Expert": "Expert:innen"
     }
 };
 
@@ -376,7 +376,7 @@ export default function Home() {
                                             )}
                                         </div>
 
-                                        {/* Category selector */}
+                                        {/* Category selector tab*/}
                                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
                                             {imageLoading ? (
                                                 Array(4).fill(0).map((_, i) => (
@@ -405,7 +405,7 @@ export default function Home() {
                                         </div>
 
 
-                                      
+
 
                                         <div className={`bg-white rounded-[12.216px] p-4 flex-1  scrollable-container max-h-[230px] ${imageLoading ? 'animate-pulse' : ''}`}>
                                             {imageLoading ? (
@@ -420,7 +420,7 @@ export default function Home() {
                                                 </div>
                                             )}
                                         </div>
-                                      
+
                                     </div>
                                 )}
                             </div>
